@@ -14,4 +14,8 @@ class Recognizers with ChangeNotifier {
   List<Recognizer> getRecognizers() {
     return this.recognizer;
   }
+
+  void refreshRecognizers() {
+    notifyListeners();
+  }
 }

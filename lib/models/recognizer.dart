@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 class Recognizer {
   String _filePath = "";
   List<TextBlock> _textBlock = new List.empty(growable: true);
+  List<int> _savedTextBlockIds = new List.empty(growable: true);
   int widthImage = 0;
   int heightImage = 0;
 
@@ -44,7 +45,33 @@ class Recognizer {
     return this._textBlock;
   }
 
+  void addSavedTextBlock(int textBlockId) {
+    if (!this._savedTextBlockIds.contains(textBlockId)) {
+      this._savedTextBlockIds.add(textBlockId);
+    }
+  }
+
+  List<TextBlock> getSavedTextBlock() {
+    List<TextBlock> savedTextBlock = new List.empty(growable: true);
+    for (int id in this._savedTextBlockIds) {
+      savedTextBlock.add(this._textBlock[id]);
+    }
+    return savedTextBlock;
+  }
+
   String getFilePath() {
     return this._filePath;
+  }
+
+  TextBlock? findTextBlockByCoordonates(double x, double y) {
+    for (TextBlock textBlock in this._textBlock) {
+      if (x > textBlock.boundingBox.left &&
+          x < textBlock.boundingBox.right &&
+          y > textBlock.boundingBox.top &&
+          y < textBlock.boundingBox.bottom) {
+        return textBlock;
+      }
+    }
+    return null;
   }
 }
