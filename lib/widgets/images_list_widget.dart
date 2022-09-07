@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:fleme/models/providers/recognizer_provider.dart';
+import 'package:fleme/views/image_filter_view.dart';
 import 'package:fleme/views/image_recognized_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -24,7 +25,7 @@ class ImagesList extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ImageRecognized(recognizedId: index),
+                  builder: (context) => ImageFilter(recognizedId: index),
                 ),
               );
             },

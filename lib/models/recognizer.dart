@@ -8,6 +8,8 @@ import 'package:provider/provider.dart';
 class Recognizer {
   String _filePath = "";
   List<TextBlock> _textBlock = new List.empty(growable: true);
+  int widthImage = 0;
+  int heightImage = 0;
 
   Recognizer(this._filePath);
 
@@ -19,6 +21,14 @@ class Recognizer {
     InputImage inputImage = InputImage.fromFilePath(getFilePath());
     String myDecryptedText = '';
     final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+
+    File image =
+        new File(getFilePath()); // Or any other way to get a File instance.
+    var decodedImage = await decodeImageFromList(image.readAsBytesSync());
+
+    widthImage = decodedImage.width;
+    heightImage = decodedImage.height;
+
     RecognizedText recognizedText =
         await textRecognizer.processImage(inputImage);
     for (TextBlock block in recognizedText?.blocks ?? []) {

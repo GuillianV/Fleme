@@ -23,6 +23,9 @@ class _CameraPageState extends State<CameraPage> {
   XFile? pictureFile;
   double controllerRatio = 1.0;
   double deviceRatio = 1;
+  bool showFocusCircle = false;
+  double x = 0;
+  double y = 0;
 
   @override
   void initState() {
@@ -76,19 +79,37 @@ class _CameraPageState extends State<CameraPage> {
       );
     }
     return Scaffold(
-      body: Center(
-        child: Transform.scale(
-          scale: 1.2,
-          child: Center(
-            child: AspectRatio(
-              aspectRatio: controllerRatio,
-              child: SizedBox(
-                  width: width,
-                  height: height,
-                  child: CameraPreview(controller)),
+      body: GestureDetector(
+        onTapUp: (details) {
+          _onTap(details);
+        },
+        child: Stack(children: [
+          Center(
+            child: Transform.scale(
+              scale: 1.2,
+              child: Center(
+                child: AspectRatio(
+                  aspectRatio: controllerRatio,
+                  child: SizedBox(
+                      width: width,
+                      height: height,
+                      child: CameraPreview(controller)),
+                ),
+              ),
             ),
           ),
-        ),
+          if (showFocusCircle)
+            Positioned(
+                top: y - 20,
+                left: x - 20,
+                child: Container(
+                  height: 40,
+                  width: 40,
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 1.5)),
+                ))
+        ]),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: MorphismButton(
@@ -106,14 +127,13 @@ class _CameraPageState extends State<CameraPage> {
             if (pictureFile != null) {
               var picture = context.read<Picture>();
               picture.saveFilePath(pictureFile?.path ?? "");
-               
+
               Recognizer recognizer = Recognizer.create(picture.getFilePath());
               recognizer.setTextBlock();
               var recognizers = context.read<Recognizers>();
               recognizers.addRecognizer(recognizer);
-
             }
-          
+
             // ignore: use_build_context_synchronously
             Navigator.push(
               context,
@@ -125,5 +145,36 @@ class _CameraPageState extends State<CameraPage> {
             );
           }),
     );
+  }
+
+  Future<void> _onTap(TapUpDetails details) async {
+    if (controller.value.isInitialized) {
+      showFocusCircle = true;
+      x = details.localPosition.dx;
+      y = details.localPosition.dy;
+
+      double fullWidth = MediaQuery.of(context).size.width;
+      double cameraHeight = fullWidth * controller.value.aspectRatio;
+
+      double xp = x / fullWidth;
+      double yp = y / cameraHeight;
+
+      Offset point = Offset(xp, yp);
+      print("point : $point");
+
+      // Manually focus
+      await controller.setFocusPoint(point);
+
+      // Manually set light exposure
+      //controller.setExposurePoint(point);
+
+      setState(() {
+        Future.delayed(const Duration(seconds: 2)).whenComplete(() {
+          setState(() {
+            showFocusCircle = false;
+          });
+        });
+      });
+    }
   }
 }
