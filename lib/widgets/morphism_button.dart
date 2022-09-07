@@ -6,13 +6,13 @@ class MorphismButton extends StatefulWidget {
       {super.key,
       required this.textValue,
       required this.onTaped,
-      this.child,
+      this.icon,
       this.fontSize});
 
   final String textValue;
   final Function onTaped;
   final double? fontSize;
-  final Widget? child;
+  final Icon? icon;
 
   @override
   State<MorphismButton> createState() => _MorphismButtonState();
@@ -34,15 +34,18 @@ class _MorphismButtonState extends State<MorphismButton> {
         })
       },
       child: Container(
-        width: width * 0.8,
-        height: height * 0.07,
+        width: 100,
+        height: 50,
         child: Center(
-            child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text(widget.textValue,
-              style: GoogleFonts.poppins(
-                  textStyle: TextStyle(fontSize: widget.fontSize ?? 15))),
-        )),
+            child: widget.icon != null
+                ? widget.icon!
+                : Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(widget.textValue,
+                        style: GoogleFonts.poppins(
+                            textStyle:
+                                TextStyle(fontSize: widget.fontSize ?? 15))),
+                  )),
         decoration: !_isPressed
             ? BoxDecoration(
                 color: Color.fromARGB(255, 242, 242, 242),

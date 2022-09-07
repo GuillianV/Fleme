@@ -1,10 +1,14 @@
 import 'dart:io';
 import 'package:fleme/main.dart';
-import 'package:fleme/models/picture.dart';
+import 'package:fleme/models/providers/picture.dart';
+import 'package:fleme/models/recognizer.dart';
+import 'package:fleme/views/homepage_view.dart';
 import 'package:fleme/widgets/morphism_button.dart';
 import 'package:provider/provider.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+
+import '../models/providers/recognizer_provider.dart';
 
 class CameraPage extends StatefulWidget {
   final List<CameraDescription>? cameras;
@@ -88,13 +92,28 @@ class _CameraPageState extends State<CameraPage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: MorphismButton(
+          icon: const Icon(
+            Icons.camera_alt,
+            color: Colors.black54,
+            size: 30.0,
+            textDirection: TextDirection.ltr,
+            semanticLabel:
+                'Icon', // Announced in accessibility modes (e.g TalkBack/VoiceOver). This label does not show in the UI.
+          ),
           textValue: "Scan !",
           onTaped: () async {
             pictureFile = await controller.takePicture();
             if (pictureFile != null) {
               var picture = context.read<Picture>();
               picture.saveFilePath(pictureFile?.path ?? "");
+               
+              Recognizer recognizer = Recognizer.create(picture.getFilePath());
+              recognizer.setTextBlock();
+              var recognizers = context.read<Recognizers>();
+              recognizers.addRecognizer(recognizer);
+
             }
+          
             // ignore: use_build_context_synchronously
             Navigator.push(
               context,
