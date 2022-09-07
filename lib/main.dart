@@ -1,8 +1,17 @@
-import 'package:fleme/widgets/camera.dart';
+import 'dart:io';
+import 'package:camera/camera.dart';
+import 'package:fleme/models/picture.dart';
+import 'package:fleme/views/camera_view.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => Picture(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -36,11 +45,27 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[Center(child: TakePictureScreen(camera: null,))],
+          children: <Widget>[
+            Center(child: Text('Hello World')),
+            Consumer<Picture>(
+                builder: (context, picture, child) =>
+                    Image.file(File(picture.getFilePath()))),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => {},
+        onPressed: () async {
+          await availableCameras().then(
+            (value) => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CameraPage(
+                  cameras: value,
+                ),
+              ),
+            ),
+          );
+        },
         tooltip: 'Picture',
         child: const Icon(Icons.image),
       ), // This trailing comma makes auto-formatting nicer for build methods.
