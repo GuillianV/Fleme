@@ -17,6 +17,9 @@ class ImageFilter extends StatefulWidget {
 double width = 0;
 double height = 0;
 
+double containerWidth = 0;
+double containerHeight = 0;
+
 late Recognizers recognzers;
 late Recognizer recognizer;
 
@@ -29,31 +32,41 @@ class _ImageFilterState extends State<ImageFilter> {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
 
+    containerWidth = width * 1;
+    containerHeight = height * 1;
+
     recognzers = context.read<Recognizers>();
     recognizer = recognzers.getRecognizers()[widget.recognizedId];
 
-    aspectRationWidth = recognizer.widthImage / width;
-    aspectRationHeight = recognizer.heightImage / height;
+    aspectRationWidth = recognizer.widthImage / containerWidth;
+    aspectRationHeight = recognizer.heightImage / containerHeight;
 
     return Scaffold(
-        body: Listener(
-      onPointerMove: (event) {
-        TextBlock? textBlock = recognizer.findTextBlockByCoordonates(
-            event.position.dx * aspectRationWidth,
-            event.position.dy * aspectRationHeight);
-        if (textBlock != null) {
-          saveTextBlock(context, recognizer.getTextBlock().indexOf(textBlock));
-        }
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            fit: BoxFit.cover,
-            image: Image.file(File(recognizer.getFilePath())).image,
+        body: Center(
+      child: SizedBox(
+        width: containerWidth,
+        height: containerHeight,
+        child: Listener(
+          onPointerMove: (event) {
+            TextBlock? textBlock = recognizer.findTextBlockByCoordonates(
+                event.position.dx * aspectRationWidth,
+                event.position.dy * aspectRationHeight);
+            if (textBlock != null) {
+              saveTextBlock(
+                  context, recognizer.getTextBlock().indexOf(textBlock));
+            }
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                fit: BoxFit.cover,
+                image: Image.file(File(recognizer.getFilePath())).image,
+              ),
+            ),
+            child: Stack(
+              children: showPositioned(context, widget.recognizedId),
+            ),
           ),
-        ),
-        child: Stack(
-          children: showPositioned(context, widget.recognizedId),
         ),
       ),
     ));
