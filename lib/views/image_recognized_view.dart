@@ -1,9 +1,12 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:camera/camera.dart';
 import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:fleme/views/camera_view.dart';
+import 'package:fleme/widgets/image_resume_widget.dart';
 import 'package:fleme/widgets/images_list_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:provider/provider.dart';
 
@@ -23,71 +26,66 @@ class _ImageRecognizedState extends State<ImageRecognized> {
     double height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      body: Center(
-        child: SingleChildScrollView(
-          child: Expanded(
-            child:
-                Consumer<Recognizers>(builder: (context, recognizers, child) {
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                    width: width,
-                    height: height * 0.3,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        fit: BoxFit.cover,
-                        image: Image.file(File(recognizers
-                                .recognizers[widget.recognizedId]
-                                .getFilePath()))
-                            .image,
-                      ),
-                    ),
-                  ),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    padding: EdgeInsets.zero,
-                    scrollDirection: Axis.vertical,
-                    physics: ScrollPhysics(),
-                    itemCount: recognizers.recognizers[widget.recognizedId]
-                        .getSavedTextBlock()
-                        .length,
-                    itemBuilder: (context, index) {
-                      TextBlock textBlock = recognizers
-                          .recognizers[widget.recognizedId]
-                          .getSavedTextBlock()[index];
+      body: Column(
+        children: [
+          ImageResume(
+              width: width, height: height, recognizedId: widget.recognizedId),
+          Center(
+            child: SingleChildScrollView(
+              child: Expanded(
+                child: Consumer<Recognizers>(
+                    builder: (context, recognizers, child) {
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      ListView.builder(
+                        shrinkWrap: true,
+                        padding: EdgeInsets.zero,
+                        scrollDirection: Axis.vertical,
+                        physics: ScrollPhysics(),
+                        itemCount: recognizers
+                                .getRecognizer(widget.recognizedId)
+                                ?.getSavedTextBlock()
+                                .length ??
+                            0,
+                        itemBuilder: (context, index) {
+                          TextBlock textBlock = recognizers
+                              .getRecognizer(widget.recognizedId)!
+                              .getSavedTextBlock()[index];
 
-                      return GestureDetector(
-                        onTap: () {},
-                        child: Container(
-                          child: Text(textBlock.text),
-                          padding: const EdgeInsets.all(10.0),
-                          margin: const EdgeInsets.all(5.0),
-                          decoration: BoxDecoration(
-                            color: Color.fromARGB(255, 192, 225, 253),
-                            borderRadius: BorderRadius.circular(5),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: Colors.blue[200]!,
-                                  offset: const Offset(2, 2),
-                                  blurRadius: 10,
-                                  spreadRadius: 1),
-                              const BoxShadow(
-                                  color: Colors.white,
-                                  offset: const Offset(-2, -2),
-                                  blurRadius: 10,
-                                  spreadRadius: 1)
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  )
-                ],
-              );
-            }),
+                          return GestureDetector(
+                            onTap: () {},
+                            child: Container(
+                              child: Text(textBlock.text),
+                              padding: const EdgeInsets.all(10.0),
+                              margin: const EdgeInsets.all(5.0),
+                              decoration: BoxDecoration(
+                                color: Color.fromARGB(255, 192, 225, 253),
+                                borderRadius: BorderRadius.circular(5),
+                                boxShadow: [
+                                  BoxShadow(
+                                      color: Colors.blue[200]!,
+                                      offset: const Offset(2, 2),
+                                      blurRadius: 10,
+                                      spreadRadius: 1),
+                                  const BoxShadow(
+                                      color: Colors.white,
+                                      offset: const Offset(-2, -2),
+                                      blurRadius: 10,
+                                      spreadRadius: 1)
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      )
+                    ],
+                  );
+                }),
+              ),
+            ),
           ),
-        ),
+        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Row(
@@ -116,7 +114,8 @@ class _ImageRecognizedState extends State<ImageRecognized> {
 
                   Navigator.pushNamed(context, "/");
                   Recognizers recognzers = context.read<Recognizers>();
-                  recognzers.removeRecognizerById(widget.recognizedId);
+                  recognzers.removeRecognizerById(widget.recognizedId,
+                      refresh: false);
                 },
                 child: const Icon(Icons.close, color: Colors.white70),
                 backgroundColor: Colors.red,

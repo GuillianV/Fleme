@@ -21,7 +21,7 @@ double containerWidth = 0;
 double containerHeight = 0;
 
 late Recognizers recognzers;
-late Recognizer recognizer;
+late Recognizer? recognizer;
 
 double aspectRationWidth = 1;
 double aspectRationHeight = 1;
@@ -36,10 +36,13 @@ class _ImageFilterState extends State<ImageFilter> {
     containerHeight = height * 1;
 
     recognzers = context.read<Recognizers>();
-    recognizer = recognzers.getRecognizers()[widget.recognizedId];
 
-    aspectRationWidth = recognizer.widthImage / containerWidth;
-    aspectRationHeight = recognizer.heightImage / containerHeight;
+    recognizer = recognzers.getRecognizer(widget.recognizedId);
+
+    if (recognizer == null) Navigator.pushNamed(context, "/");
+
+    aspectRationWidth = (recognizer?.widthImage ?? 1920) / containerWidth;
+    aspectRationHeight = (recognizer?.heightImage ?? 1080) / containerHeight;
 
     return Scaffold(
       body: Center(
@@ -48,19 +51,19 @@ class _ImageFilterState extends State<ImageFilter> {
           height: containerHeight,
           child: Listener(
             onPointerMove: (event) {
-              TextBlock? textBlock = recognizer.findTextBlockByCoordonates(
+              TextBlock? textBlock = recognizer!.findTextBlockByCoordonates(
                   event.position.dx * aspectRationWidth,
                   event.position.dy * aspectRationHeight);
               if (textBlock != null) {
                 saveTextBlock(
-                    context, recognizer.getTextBlock().indexOf(textBlock));
+                    context, recognizer!.getTextBlock().indexOf(textBlock));
               }
             },
             child: Container(
               decoration: BoxDecoration(
                 image: DecorationImage(
                   fit: BoxFit.cover,
-                  image: Image.file(File(recognizer.getFilePath())).image,
+                  image: Image.file(File(recognizer!.getFilePath())).image,
                 ),
               ),
               child: Stack(
@@ -106,7 +109,7 @@ class _ImageFilterState extends State<ImageFilter> {
   List<Widget> showPositioned(BuildContext context, int recognizedId) {
     List<Widget> positioned = List.empty(growable: true);
 
-    positioned = recognizer
+    positioned = recognizer!
         .getTextBlock()
         .map((textBlock) => Positioned(
               left: textBlock.boundingBox.left.toDouble() / aspectRationWidth,
@@ -116,14 +119,14 @@ class _ImageFilterState extends State<ImageFilter> {
                   textBlock.boundingBox.height.toDouble() / aspectRationHeight,
               child: GestureDetector(onTap: () {
                 saveTextBlock(
-                    context, recognizer.getTextBlock().indexOf(textBlock));
+                    context, recognizer!.getTextBlock().indexOf(textBlock));
               }, onPanUpdate: (details) {
                 saveTextBlock(
-                    context, recognizer.getTextBlock().indexOf(textBlock));
+                    context, recognizer!.getTextBlock().indexOf(textBlock));
               }, child:
                   Consumer<Recognizers>(builder: (context, recognizers, child) {
                 bool isSaved =
-                    recognizer.getSavedTextBlock().contains(textBlock);
+                    recognizer!.getSavedTextBlock().contains(textBlock);
 
                 return IgnorePointer(
                   ignoring: isSaved,
@@ -147,7 +150,7 @@ class _ImageFilterState extends State<ImageFilter> {
   }
 
   void saveTextBlock(BuildContext context, int textBlockId) {
-    recognizer.addSavedTextBlock(textBlockId);
+    recognizer!.addSavedTextBlock(textBlockId);
     Provider.of<Recognizers>(context, listen: false).refreshRecognizers();
   }
 }

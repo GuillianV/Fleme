@@ -5,14 +5,30 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class Recognizers with ChangeNotifier {
-  List<Recognizer> recognizers = new List.empty(growable: true);
+  List<Recognizer> _recognizers = new List.empty(growable: true);
 
   void addRecognizer(Recognizer recognizer) {
-    this.recognizers.add(recognizer);
+    this._recognizers.add(recognizer);
+  }
+
+  bool exists(int recognizerId) {
+    if (_recognizers.length > 0 && _recognizers.length > recognizerId) {
+      Recognizer? recognizerExist = _recognizers.elementAt(recognizerId);
+      return recognizerExist != null ? true : false;
+    }
+
+    return false;
   }
 
   List<Recognizer> getRecognizers() {
-    return this.recognizers;
+    return this._recognizers;
+  }
+
+  Recognizer? getRecognizer(int recognizerId) {
+    if (exists(recognizerId))
+      return this._recognizers[recognizerId];
+    else
+      return null;
   }
 
   void refreshRecognizers() {
@@ -20,7 +36,7 @@ class Recognizers with ChangeNotifier {
   }
 
   bool removeRecognizer(Recognizer _recognizer) {
-    if (recognizers.remove(_recognizer)) {
+    if (_recognizers.remove(_recognizer)) {
       notifyListeners();
       return true;
     } else {
@@ -29,18 +45,18 @@ class Recognizers with ChangeNotifier {
     }
   }
 
-  bool removeRecognizerById(int recognizerId) {
+  bool removeRecognizerById(int recognizerId, {bool refresh = true}) {
     late Recognizer recognizerToDelete;
-    if (recognizers.length > recognizerId) {
-      recognizerToDelete = recognizers[recognizerId];
+    if (_recognizers.length > recognizerId) {
+      recognizerToDelete = _recognizers[recognizerId];
     } else
       return false;
 
-    if (recognizers.remove(recognizerToDelete)) {
-      notifyListeners();
+    if (_recognizers.remove(recognizerToDelete)) {
+      refresh ? this.refreshRecognizers() : null;
       return true;
     } else {
-      notifyListeners();
+      refresh ? this.refreshRecognizers() : null;
       return true;
     }
   }

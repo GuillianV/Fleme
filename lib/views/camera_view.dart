@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:fleme/main.dart';
-import 'package:fleme/models/providers/picture.dart';
+import 'package:fleme/models/providers/picture_provider.dart';
 import 'package:fleme/models/recognizer.dart';
 import 'package:fleme/views/homepage_view.dart';
 import 'package:fleme/views/image_filter_view.dart';
