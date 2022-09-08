@@ -22,12 +22,7 @@ class ImagesList extends StatelessWidget {
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ImageFilter(recognizedId: index),
-                ),
-              );
+              Navigator.pushNamed(context, '/image_filter', arguments: index);
             },
             child: Container(
               height: 200,

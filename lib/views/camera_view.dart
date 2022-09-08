@@ -3,6 +3,7 @@ import 'package:fleme/main.dart';
 import 'package:fleme/models/providers/picture.dart';
 import 'package:fleme/models/recognizer.dart';
 import 'package:fleme/views/homepage_view.dart';
+import 'package:fleme/views/image_filter_view.dart';
 import 'package:fleme/widgets/morphism_button.dart';
 import 'package:provider/provider.dart';
 import 'package:camera/camera.dart';
@@ -26,6 +27,7 @@ class _CameraPageState extends State<CameraPage> {
   bool showFocusCircle = false;
   double x = 0;
   double y = 0;
+  bool isPicked = false;
 
   @override
   void initState() {
@@ -108,7 +110,11 @@ class _CameraPageState extends State<CameraPage> {
                   decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(color: Colors.white, width: 1.5)),
-                ))
+                )),
+          if (isPicked)
+            Container(
+                color: Colors.black54,
+                child: Center(child: CircularProgressIndicator())),
         ]),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -123,26 +129,35 @@ class _CameraPageState extends State<CameraPage> {
           ),
           textValue: "Scan !",
           onTaped: () async {
+            setState(() {
+              isPicked = true;
+            });
             pictureFile = await controller.takePicture();
             if (pictureFile != null) {
               var picture = context.read<Picture>();
               picture.saveFilePath(pictureFile?.path ?? "");
 
               Recognizer recognizer = Recognizer.create(picture.getFilePath());
-              recognizer.setTextBlock();
+              await recognizer.setTextBlock();
               var recognizers = context.read<Recognizers>();
               recognizers.addRecognizer(recognizer);
+
+              int recognizerIndex =
+                  recognizers.getRecognizers().indexOf(recognizer);
+
+              setState(() {
+                isPicked = false;
+              });
+              Navigator.pushNamed(context, '/image_filter',
+                  arguments: recognizerIndex);
+            } else {
+              setState(() {
+                isPicked = false;
+              });
+              Navigator.pushNamed(context, '/');
             }
 
             // ignore: use_build_context_synchronously
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const MyHomePage(
-                  title: "Fleme",
-                ),
-              ),
-            );
           }),
     );
   }

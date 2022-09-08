@@ -99,7 +99,7 @@ class _ImageFilterState extends State<ImageFilter> {
                   ignoring: isSaved,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: isSaved
+                      color: !isSaved
                           ? Color.fromARGB(30, 16, 16, 16)
                           : Color.fromARGB(125, 255, 255, 255),
                       borderRadius: BorderRadius.circular(5),

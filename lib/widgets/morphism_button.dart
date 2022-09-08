@@ -62,7 +62,21 @@ class _MorphismButtonState extends State<MorphismButton> {
                         blurRadius: 15,
                         spreadRadius: 1)
                   ])
-            : null,
+            : BoxDecoration(
+                color: Color.fromARGB(255, 242, 242, 242),
+                borderRadius: BorderRadius.circular(50),
+                boxShadow: [
+                    BoxShadow(
+                        color: Colors.grey[400]!,
+                        offset: const Offset(4, 4),
+                        blurRadius: 5,
+                        spreadRadius: -1),
+                    const BoxShadow(
+                        color: Colors.white,
+                        offset: const Offset(-4, -4),
+                        blurRadius: 5,
+                        spreadRadius: -1)
+                  ]),
       ),
     );
   }

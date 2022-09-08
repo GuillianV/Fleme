@@ -91,16 +91,8 @@ class _ImageRecognizedState extends State<ImageRecognized> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          await availableCameras().then(
-            (value) => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => CameraPage(
-                  cameras: value,
-                ),
-              ),
-            ),
-          );
+          await availableCameras().then((value) =>
+              Navigator.pushNamed(context, '/camera', arguments: value));
         },
         tooltip: 'Picture',
         child: const Icon(Icons.image),
