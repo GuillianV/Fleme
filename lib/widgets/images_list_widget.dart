@@ -22,7 +22,8 @@ class ImagesList extends StatelessWidget {
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
-              Navigator.pushNamed(context, '/image_filter', arguments: index);
+              Navigator.pushNamed(context, '/image_recognized',
+                  arguments: index);
             },
             child: Container(
               height: 200,
@@ -31,7 +32,7 @@ class ImagesList extends StatelessWidget {
               decoration: BoxDecoration(
                 image: DecorationImage(
                   image: Image.file(
-                          File(recognizers.recognizer[index].getFilePath()))
+                          File(recognizers.recognizers[index].getFilePath()))
                       .image,
                   fit: BoxFit.cover,
                 ),

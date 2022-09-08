@@ -5,17 +5,43 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class Recognizers with ChangeNotifier {
-  List<Recognizer> recognizer = new List.empty(growable: true);
+  List<Recognizer> recognizers = new List.empty(growable: true);
 
   void addRecognizer(Recognizer recognizer) {
-    this.recognizer.add(recognizer);
+    this.recognizers.add(recognizer);
   }
 
   List<Recognizer> getRecognizers() {
-    return this.recognizer;
+    return this.recognizers;
   }
 
   void refreshRecognizers() {
     notifyListeners();
+  }
+
+  bool removeRecognizer(Recognizer _recognizer) {
+    if (recognizers.remove(_recognizer)) {
+      notifyListeners();
+      return true;
+    } else {
+      notifyListeners();
+      return true;
+    }
+  }
+
+  bool removeRecognizerById(int recognizerId) {
+    late Recognizer recognizerToDelete;
+    if (recognizers.length > recognizerId) {
+      recognizerToDelete = recognizers[recognizerId];
+    } else
+      return false;
+
+    if (recognizers.remove(recognizerToDelete)) {
+      notifyListeners();
+      return true;
+    } else {
+      notifyListeners();
+      return true;
+    }
   }
 }

@@ -42,34 +42,64 @@ class _ImageFilterState extends State<ImageFilter> {
     aspectRationHeight = recognizer.heightImage / containerHeight;
 
     return Scaffold(
-        body: Center(
-      child: SizedBox(
-        width: containerWidth,
-        height: containerHeight,
-        child: Listener(
-          onPointerMove: (event) {
-            TextBlock? textBlock = recognizer.findTextBlockByCoordonates(
-                event.position.dx * aspectRationWidth,
-                event.position.dy * aspectRationHeight);
-            if (textBlock != null) {
-              saveTextBlock(
-                  context, recognizer.getTextBlock().indexOf(textBlock));
-            }
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                fit: BoxFit.cover,
-                image: Image.file(File(recognizer.getFilePath())).image,
+      body: Center(
+        child: SizedBox(
+          width: containerWidth,
+          height: containerHeight,
+          child: Listener(
+            onPointerMove: (event) {
+              TextBlock? textBlock = recognizer.findTextBlockByCoordonates(
+                  event.position.dx * aspectRationWidth,
+                  event.position.dy * aspectRationHeight);
+              if (textBlock != null) {
+                saveTextBlock(
+                    context, recognizer.getTextBlock().indexOf(textBlock));
+              }
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  fit: BoxFit.cover,
+                  image: Image.file(File(recognizer.getFilePath())).image,
+                ),
               ),
-            ),
-            child: Stack(
-              children: showPositioned(context, widget.recognizedId),
+              child: Stack(
+                children: showPositioned(context, widget.recognizedId),
+              ),
             ),
           ),
         ),
       ),
-    ));
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: FloatingActionButton(
+                heroTag: "delete",
+                onPressed: () {
+                  recognzers.removeRecognizerById(widget.recognizedId);
+                  Navigator.pop(context);
+                },
+                child: const Icon(Icons.close),
+                backgroundColor: Colors.red,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: FloatingActionButton(
+                  heroTag: "save",
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/image_recognized',
+                        arguments: widget.recognizedId);
+                  },
+                  child: const Icon(Icons.save)),
+            ),
+          ]),
+    );
   }
 
   //Charge les textBlocs en positionned
@@ -100,8 +130,8 @@ class _ImageFilterState extends State<ImageFilter> {
                   child: Container(
                     decoration: BoxDecoration(
                       color: !isSaved
-                          ? Color.fromARGB(30, 16, 16, 16)
-                          : Color.fromARGB(125, 255, 255, 255),
+                          ? const Color.fromARGB(30, 16, 16, 16)
+                          : const Color.fromARGB(125, 255, 255, 255),
                       borderRadius: BorderRadius.circular(5),
                       border: Border.all(
                           color: Colors.white, width: 0.5 // red as border color

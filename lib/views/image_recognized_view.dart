@@ -38,7 +38,7 @@ class _ImageRecognizedState extends State<ImageRecognized> {
                       image: DecorationImage(
                         fit: BoxFit.cover,
                         image: Image.file(File(recognizers
-                                .recognizer[widget.recognizedId]
+                                .recognizers[widget.recognizedId]
                                 .getFilePath()))
                             .image,
                       ),
@@ -49,13 +49,13 @@ class _ImageRecognizedState extends State<ImageRecognized> {
                     padding: EdgeInsets.zero,
                     scrollDirection: Axis.vertical,
                     physics: ScrollPhysics(),
-                    itemCount: recognizers.recognizer[widget.recognizedId]
-                        .getTextBlock()
+                    itemCount: recognizers.recognizers[widget.recognizedId]
+                        .getSavedTextBlock()
                         .length,
                     itemBuilder: (context, index) {
                       TextBlock textBlock = recognizers
-                          .recognizer[widget.recognizedId]
-                          .getTextBlock()[index];
+                          .recognizers[widget.recognizedId]
+                          .getSavedTextBlock()[index];
 
                       return GestureDetector(
                         onTap: () {},
@@ -89,14 +89,47 @@ class _ImageRecognizedState extends State<ImageRecognized> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await availableCameras().then((value) =>
-              Navigator.pushNamed(context, '/camera', arguments: value));
-        },
-        tooltip: 'Picture',
-        child: const Icon(Icons.image),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: FloatingActionButton(
+                heroTag: "home",
+                onPressed: () {
+                  // recognzers.removeRecognizerById(widget.recognizedId);
+                  Navigator.pushNamed(context, "/");
+                },
+                child: const Icon(Icons.home, color: Colors.black87),
+                backgroundColor: Colors.white,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: FloatingActionButton(
+                heroTag: "delete_image_r",
+                onPressed: () {
+                  // recognzers.removeRecognizerById(widget.recognizedId);
+
+                  Navigator.pushNamed(context, "/");
+                  Recognizers recognzers = context.read<Recognizers>();
+                  recognzers.removeRecognizerById(widget.recognizedId);
+                },
+                child: const Icon(Icons.close, color: Colors.white70),
+                backgroundColor: Colors.red,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: FloatingActionButton(
+                  heroTag: "send",
+                  onPressed: () {},
+                  child: const Icon(Icons.send)),
+            ),
+          ]), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
