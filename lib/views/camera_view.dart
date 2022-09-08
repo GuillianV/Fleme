@@ -28,6 +28,9 @@ class _CameraPageState extends State<CameraPage> {
   double x = 0;
   double y = 0;
   bool isPicked = false;
+  double zoom = 1.0;
+  double maxZoomLevel = 1.0;
+  double minZoomLevel = 1.0;
 
   @override
   void initState() {
@@ -46,6 +49,13 @@ class _CameraPageState extends State<CameraPage> {
         controllerRatio = controller.value.previewSize!.height /
             controller.value.previewSize!.width;
       });
+
+      controller.getMaxZoomLevel().then((value) => setState(() {
+            maxZoomLevel = value;
+          }));
+      controller.getMinZoomLevel().then((value) => setState(() {
+            minZoomLevel = value;
+          }));
     });
   }
 
@@ -92,10 +102,27 @@ class _CameraPageState extends State<CameraPage> {
               child: Center(
                 child: AspectRatio(
                   aspectRatio: controllerRatio,
-                  child: SizedBox(
-                      width: width,
-                      height: height,
-                      child: CameraPreview(controller)),
+                  child: GestureDetector(
+                    onVerticalDragUpdate: (details) {
+                      if (details.delta.dy > 0 && zoom < maxZoomLevel) {
+                        setState(() {
+                          zoom = zoom + 0.1;
+                          controller.setZoomLevel(zoom);
+                        });
+                      }
+
+                      if (details.delta.dy < 0 && zoom > 1.0) {
+                        setState(() {
+                          zoom = zoom - 0.1;
+                          controller.setZoomLevel(zoom);
+                        });
+                      }
+                    },
+                    child: SizedBox(
+                        width: width,
+                        height: height,
+                        child: CameraPreview(controller)),
+                  ),
                 ),
               ),
             ),
@@ -118,47 +145,54 @@ class _CameraPageState extends State<CameraPage> {
         ]),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: MorphismButton(
-          icon: const Icon(
-            Icons.camera_alt,
-            color: Colors.black54,
-            size: 30.0,
-            textDirection: TextDirection.ltr,
-            semanticLabel:
-                'Icon', // Announced in accessibility modes (e.g TalkBack/VoiceOver). This label does not show in the UI.
-          ),
-          textValue: "Scan !",
-          onTaped: () async {
-            setState(() {
-              isPicked = true;
-            });
-            pictureFile = await controller.takePicture();
-            if (pictureFile != null) {
-              var picture = context.read<Picture>();
-              picture.saveFilePath(pictureFile?.path ?? "");
+      floatingActionButton: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          MorphismButton(
+              icon: const Icon(
+                Icons.camera_alt,
+                color: Colors.black54,
+                size: 30.0,
+                textDirection: TextDirection.ltr,
+                semanticLabel:
+                    'Icon', // Announced in accessibility modes (e.g TalkBack/VoiceOver). This label does not show in the UI.
+              ),
+              textValue: "Scan !",
+              onTaped: () async {
+                setState(() {
+                  isPicked = true;
+                });
+                pictureFile = await controller.takePicture();
+                if (pictureFile != null) {
+                  var picture = context.read<Picture>();
+                  picture.saveFilePath(pictureFile?.path ?? "");
 
-              Recognizer recognizer = Recognizer.create(picture.getFilePath());
-              await recognizer.setTextBlock();
-              var recognizers = context.read<Recognizers>();
-              recognizers.addRecognizer(recognizer);
+                  Recognizer recognizer =
+                      Recognizer.create(picture.getFilePath());
+                  await recognizer.setTextBlock();
+                  var recognizers = context.read<Recognizers>();
+                  recognizers.addRecognizer(recognizer);
 
-              int recognizerIndex =
-                  recognizers.getRecognizers().indexOf(recognizer);
+                  int recognizerIndex =
+                      recognizers.getRecognizers().indexOf(recognizer);
 
-              setState(() {
-                isPicked = false;
-              });
-              Navigator.pushNamed(context, '/image_filter',
-                  arguments: recognizerIndex);
-            } else {
-              setState(() {
-                isPicked = false;
-              });
-              Navigator.pushNamed(context, '/');
-            }
+                  setState(() {
+                    isPicked = false;
+                  });
+                  Navigator.pushNamed(context, '/image_filter',
+                      arguments: recognizerIndex);
+                } else {
+                  setState(() {
+                    isPicked = false;
+                  });
+                  Navigator.pushNamed(context, '/');
+                }
 
-            // ignore: use_build_context_synchronously
-          }),
+                // ignore: use_build_context_synchronously
+              }),
+        ],
+      ),
     );
   }
 
@@ -171,8 +205,8 @@ class _CameraPageState extends State<CameraPage> {
       double fullWidth = MediaQuery.of(context).size.width;
       double cameraHeight = fullWidth * controller.value.aspectRatio;
 
-      double xp = x / fullWidth;
-      double yp = y / cameraHeight;
+      double xp = (x / fullWidth).clamp(0, 1.0);
+      double yp = (y / cameraHeight).clamp(0, 1.0);
 
       Offset point = Offset(xp, yp);
       print("point : $point");
