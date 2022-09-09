@@ -7,9 +7,12 @@ import 'package:fleme/views/homepage_view.dart';
 import 'package:fleme/views/image_filter_view.dart';
 import 'package:fleme/views/image_recognized_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+Future main() async {
+  await dotenv.load(fileName: ".env");
+
   runApp(
     MultiProvider(
       providers: [
@@ -49,13 +52,10 @@ class MyApp extends StatelessWidget {
           final value = settings.arguments as int;
           return MaterialPageRoute(
               builder: (_) => ImageRecognized(recognizedId: value));
-        }
-        else if (settings.name == '/camera') {
+        } else if (settings.name == '/camera') {
           final value = settings.arguments as List<CameraDescription>;
-          return MaterialPageRoute(
-              builder: (_) => CameraPage(cameras: value));
+          return MaterialPageRoute(builder: (_) => CameraPage(cameras: value));
         }
-
 
         return null;
       },

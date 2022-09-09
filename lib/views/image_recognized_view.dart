@@ -2,6 +2,8 @@ import 'dart:io';
 import 'dart:ui';
 import 'package:camera/camera.dart';
 import 'package:fleme/models/providers/recognizer_provider.dart';
+import 'package:fleme/models/recognizer.dart';
+import 'package:fleme/models/recognizerNetwork.dart';
 import 'package:fleme/views/camera_view.dart';
 import 'package:fleme/widgets/image_resume_widget.dart';
 import 'package:fleme/widgets/images_list_widget.dart';
@@ -125,7 +127,19 @@ class _ImageRecognizedState extends State<ImageRecognized> {
               padding: const EdgeInsets.all(32.0),
               child: FloatingActionButton(
                   heroTag: "send",
-                  onPressed: () {},
+                  onPressed: () async {
+                    Recognizers recognzers = context.read<Recognizers>();
+                    Recognizer? recognizer =
+                        recognzers.getRecognizer(widget.recognizedId);
+                    if (recognizer == null) Navigator.pushNamed(context, "/");
+
+                    String _text = recognizer!
+                        .getSavedTextBlock()
+                        .map((e) => e.text)
+                        .join(" ");
+                    RecognizerNetwork recognizerNetwork =
+                        await RecognizerNetwork.post(_text);
+                  },
                   child: const Icon(Icons.send)),
             ),
           ]), // This trailing comma makes auto-formatting nicer for build methods.

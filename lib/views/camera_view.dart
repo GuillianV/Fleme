@@ -107,6 +107,7 @@ class _CameraPageState extends State<CameraPage> {
                       if (details.delta.dy > 0 && zoom < maxZoomLevel) {
                         setState(() {
                           zoom = zoom + 0.1;
+                          if (zoom > maxZoomLevel) zoom = maxZoomLevel;
                           controller.setZoomLevel(zoom);
                         });
                       }
@@ -114,6 +115,7 @@ class _CameraPageState extends State<CameraPage> {
                       if (details.delta.dy < 0 && zoom > 1.0) {
                         setState(() {
                           zoom = zoom - 0.1;
+                          if (zoom < 1.0) zoom = 1;
                           controller.setZoomLevel(zoom);
                         });
                       }
