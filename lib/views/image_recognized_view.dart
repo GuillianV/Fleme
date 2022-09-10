@@ -4,8 +4,11 @@ import 'package:camera/camera.dart';
 import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:fleme/models/recognizer.dart';
 import 'package:fleme/models/recognizerNetwork.dart';
+import 'package:fleme/utils/shadow_black.dart';
 import 'package:fleme/views/camera_view.dart';
 import 'package:fleme/widgets/image_resume_widget.dart';
+import 'package:fleme/widgets/morphism_button.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:fleme/widgets/images_list_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,6 +18,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class ImageRecognized extends StatefulWidget {
   const ImageRecognized({super.key, required this.recognizedId});
@@ -34,62 +38,75 @@ class _ImageRecognizedState extends State<ImageRecognized> {
     return Scaffold(
       body: Column(
         children: [
-          ImageResume(
-              width: width, height: height, recognizedId: widget.recognizedId),
-          Center(
-            child: SingleChildScrollView(
-              child: Expanded(
-                child: Consumer<Recognizers>(
-                    builder: (context, recognizers, child) {
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      ListView.builder(
-                        shrinkWrap: true,
-                        padding: EdgeInsets.zero,
-                        scrollDirection: Axis.vertical,
-                        physics: ScrollPhysics(),
-                        itemCount: recognizers
-                                .getRecognizer(widget.recognizedId)
-                                ?.getSavedTextBlock()
-                                .length ??
-                            0,
-                        itemBuilder: (context, index) {
-                          TextBlock textBlock = recognizers
-                              .getRecognizer(widget.recognizedId)!
-                              .getSavedTextBlock()[index];
-
-                          return GestureDetector(
-                            onTap: () {},
-                            child: Container(
-                              child: Text(textBlock.text),
-                              padding: const EdgeInsets.all(10.0),
-                              margin: const EdgeInsets.all(5.0),
-                              decoration: BoxDecoration(
-                                color: Color.fromARGB(255, 192, 225, 253),
-                                borderRadius: BorderRadius.circular(5),
-                                boxShadow: [
-                                  BoxShadow(
-                                      color: Colors.blue[200]!,
-                                      offset: const Offset(2, 2),
-                                      blurRadius: 10,
-                                      spreadRadius: 1),
-                                  const BoxShadow(
-                                      color: Colors.white,
-                                      offset: const Offset(-2, -2),
-                                      blurRadius: 10,
-                                      spreadRadius: 1)
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      )
-                    ],
-                  );
-                }),
+          Column(
+            children: [
+              ImageResume(
+                  width: width,
+                  height: height,
+                  recognizedId: widget.recognizedId),
+              Container(
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.white10,
+                        offset: Offset(2, 2),
+                        blurRadius: 10,
+                        spreadRadius: 1),
+                  ],
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child:
+                          MorphismButton(textValue: "RawText", onTaped: () {}),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: MorphismButton(
+                          textValue: "Text Blocks", onTaped: () {}),
+                    )
+                  ],
+                ),
               ),
-            ),
+            ],
+          ),
+          Expanded(
+            child:
+                Consumer<Recognizers>(builder: (context, recognizers, child) {
+              return ListView.builder(
+                shrinkWrap: true,
+                padding: EdgeInsets.zero,
+                scrollDirection: Axis.vertical,
+                physics: ScrollPhysics(),
+                itemCount: recognizers
+                        .getRecognizer(widget.recognizedId)
+                        ?.getSavedTextBlock()
+                        .length ??
+                    0,
+                itemBuilder: (context, index) {
+                  TextBlock textBlock = recognizers
+                      .getRecognizer(widget.recognizedId)!
+                      .getSavedTextBlock()[index];
+
+                  return GestureDetector(
+                    onTap: () {},
+                    child: Container(
+                      child: Text(textBlock.text),
+                      padding: const EdgeInsets.all(10.0),
+                      margin: const EdgeInsets.all(5.0),
+                      decoration: BoxDecoration(
+                        color: Color.fromARGB(255, 239, 238, 238),
+                        borderRadius: BorderRadius.circular(5),
+                        boxShadow: shadowBlack(),
+                      ),
+                    ),
+                  );
+                },
+              );
+            }),
           ),
         ],
       ),
@@ -124,6 +141,29 @@ class _ImageRecognizedState extends State<ImageRecognized> {
             FloatingActionButton(
                 heroTag: "link",
                 onPressed: () async {
+                  bool connected = false;
+                  final result = await InternetAddress.lookup("google.com");
+
+                  try {
+                    if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+                      connected = true;
+                    }
+                  } on SocketException catch (_) {
+                    print('not connected');
+                  }
+
+                  if (!connected) {
+                    Fluttertoast.showToast(
+                        msg: "Error: No internet connection",
+                        toastLength: Toast.LENGTH_LONG,
+                        gravity: ToastGravity.CENTER,
+                        timeInSecForIosWeb: 1,
+                        backgroundColor: Color.fromARGB(255, 101, 101, 101),
+                        textColor: Colors.white,
+                        fontSize: 16.0);
+                    return;
+                  }
+
                   Recognizers recognzers = context.read<Recognizers>();
                   Recognizer? recognizer =
                       recognzers.getRecognizer(widget.recognizedId);
@@ -139,19 +179,24 @@ class _ImageRecognizedState extends State<ImageRecognized> {
                   showAnimatedDialog(
                     context: context,
                     barrierDismissible: true,
-                    
                     builder: (BuildContext context) {
                       String urlValue =
                           "${dotenv.env['BACK_URL']!}:${dotenv.env['BACK_PORT']!}/${recognizerNetwork.url}";
 
+                      ClipboardData data = ClipboardData(text: urlValue);
+                      Clipboard.setData(data);
+
                       return ClassicGeneralDialogWidget(
-                        titleText: "Share link",
-                        negativeText: 'close',
-                        positiveText: 'copy',
+                        titleText: "Link Copied",
+                        negativeText: 'Close',
+                        positiveText: 'Check',
                         contentText: urlValue,
                         onPositiveClick: () async {
-                          ClipboardData data = ClipboardData(text: urlValue);
-                          await Clipboard.setData(data);
+                          Uri uri = Uri.parse(
+                              "${dotenv.env["BACK_SECURED"]! == 'false' ? 'http://' : 'https://'}$urlValue");
+                          await launchUrl(uri,
+                              mode: LaunchMode.externalApplication);
+
                           Navigator.of(context).pop();
                         },
                         onNegativeClick: () {

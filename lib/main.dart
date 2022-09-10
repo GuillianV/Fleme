@@ -39,6 +39,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        
       ),
       routes: {
         '/': (context) => const MyHomePage(title: 'Fleme'),

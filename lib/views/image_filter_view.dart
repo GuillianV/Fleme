@@ -32,8 +32,8 @@ class _ImageFilterState extends State<ImageFilter> {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
 
-    containerWidth = width * 1;
-    containerHeight = height * 1;
+    containerWidth = width * 0.9;
+    containerHeight = height * 0.9;
 
     recognzers = context.read<Recognizers>();
 
@@ -61,6 +61,7 @@ class _ImageFilterState extends State<ImageFilter> {
             },
             child: Container(
               decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
                 image: DecorationImage(
                   fit: BoxFit.cover,
                   image: Image.file(File(recognizer!.getFilePath())).image,

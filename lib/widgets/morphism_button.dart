@@ -1,3 +1,4 @@
+import 'package:fleme/utils/shadow_black.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -7,10 +8,14 @@ class MorphismButton extends StatefulWidget {
       required this.textValue,
       required this.onTaped,
       this.icon,
-      this.fontSize});
+      this.fontSize,
+      this.width,
+      this.height});
 
   final String textValue;
   final Function onTaped;
+  final double? width;
+  final double? height;
   final double? fontSize;
   final Icon? icon;
 
@@ -23,9 +28,6 @@ class _MorphismButtonState extends State<MorphismButton> {
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
-
     return GestureDetector(
       onTap: () => {
         setState(() {
@@ -34,49 +36,28 @@ class _MorphismButtonState extends State<MorphismButton> {
         })
       },
       child: Container(
-        width: 100,
-        height: 50,
+        width: widget.width ?? 100,
+        height: widget.height ?? 50,
+        decoration: !_isPressed
+            ? BoxDecoration(
+                color: Color.fromARGB(255, 242, 242, 242),
+                borderRadius: BorderRadius.circular(50),
+                boxShadow: shadowBlack())
+            : BoxDecoration(
+                color: Color.fromARGB(255, 242, 242, 242),
+                borderRadius: BorderRadius.circular(50),
+                boxShadow: shadowBlack()),
         child: Center(
             child: widget.icon != null
                 ? widget.icon!
                 : Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Text(widget.textValue,
+                        textAlign: TextAlign.center,
                         style: GoogleFonts.poppins(
                             textStyle:
                                 TextStyle(fontSize: widget.fontSize ?? 15))),
                   )),
-        decoration: !_isPressed
-            ? BoxDecoration(
-                color: Color.fromARGB(255, 242, 242, 242),
-                borderRadius: BorderRadius.circular(50),
-                boxShadow: [
-                    BoxShadow(
-                        color: Colors.grey[400]!,
-                        offset: const Offset(4, 4),
-                        blurRadius: 15,
-                        spreadRadius: 1),
-                    const BoxShadow(
-                        color: Colors.white,
-                        offset: const Offset(-4, -4),
-                        blurRadius: 15,
-                        spreadRadius: 1)
-                  ])
-            : BoxDecoration(
-                color: Color.fromARGB(255, 242, 242, 242),
-                borderRadius: BorderRadius.circular(50),
-                boxShadow: [
-                    BoxShadow(
-                        color: Colors.grey[400]!,
-                        offset: const Offset(4, 4),
-                        blurRadius: 5,
-                        spreadRadius: -1),
-                    const BoxShadow(
-                        color: Colors.white,
-                        offset: const Offset(-4, -4),
-                        blurRadius: 5,
-                        spreadRadius: -1)
-                  ]),
       ),
     );
   }

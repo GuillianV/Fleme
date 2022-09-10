@@ -1,10 +1,8 @@
 import 'dart:io';
-import 'dart:ui';
 import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:fleme/models/recognizer.dart';
 import 'package:fleme/widgets/blur_title_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class ImageResume extends StatelessWidget {

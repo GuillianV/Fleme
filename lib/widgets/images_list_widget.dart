@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import '../utils/shadow_black.dart';
+
 class ImagesList extends StatelessWidget {
   const ImagesList({
     Key? key,
@@ -48,7 +50,6 @@ class ImagesList extends StatelessWidget {
               physics: ScrollPhysics(),
               itemCount: recognizers.getRecognizers().length,
               itemBuilder: (context, index) {
-                
                 Recognizer? recognizerCible = recognizers.getRecognizer(index);
 
                 if (recognizerCible == null) {
@@ -75,18 +76,7 @@ class ImagesList extends StatelessWidget {
                       ),
                       color: const Color.fromARGB(255, 192, 225, 253),
                       borderRadius: BorderRadius.circular(5),
-                      boxShadow: const [
-                        BoxShadow(
-                            color: Colors.black87,
-                            offset: Offset(2, 2),
-                            blurRadius: 10,
-                            spreadRadius: 1),
-                        BoxShadow(
-                            color: Colors.white,
-                            offset: Offset(-2, -2),
-                            blurRadius: 10,
-                            spreadRadius: 1)
-                      ],
+                      boxShadow: shadowBlack(),
                     ),
                     child: BlurTitle(
                         text:
