@@ -8,9 +8,13 @@ import 'package:fleme/views/camera_view.dart';
 import 'package:fleme/widgets/image_resume_widget.dart';
 import 'package:fleme/widgets/images_list_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 class ImageRecognized extends StatefulWidget {
   const ImageRecognized({super.key, required this.recognizedId});
@@ -92,56 +96,87 @@ class _ImageRecognizedState extends State<ImageRecognized> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           mainAxisSize: MainAxisSize.max,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: FloatingActionButton(
-                heroTag: "home",
-                onPressed: () {
-                  // recognzers.removeRecognizerById(widget.recognizedId);
-                  Navigator.pushNamed(context, "/");
-                },
-                child: const Icon(Icons.home, color: Colors.black87),
-                backgroundColor: Colors.white,
-              ),
+            FloatingActionButton(
+              heroTag: "home",
+              onPressed: () {
+                // recognzers.removeRecognizerById(widget.recognizedId);
+                Navigator.pushNamed(context, "/");
+              },
+              child: const Icon(Icons.home, color: Colors.black87),
+              backgroundColor: Colors.white,
             ),
-            Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: FloatingActionButton(
-                heroTag: "delete_image_r",
-                onPressed: () {
-                  // recognzers.removeRecognizerById(widget.recognizedId);
+            FloatingActionButton(
+              heroTag: "delete_image_r",
+              onPressed: () {
+                // recognzers.removeRecognizerById(widget.recognizedId);
 
-                  Navigator.pushNamed(context, "/");
+                Navigator.pushNamed(context, "/");
+                Recognizers recognzers = context.read<Recognizers>();
+                recognzers.removeRecognizerById(widget.recognizedId,
+                    refresh: false);
+              },
+              child: const Icon(Icons.close, color: Colors.white70),
+              backgroundColor: Colors.red,
+            ),
+            FloatingActionButton(
+                heroTag: "link",
+                onPressed: () async {
                   Recognizers recognzers = context.read<Recognizers>();
-                  recognzers.removeRecognizerById(widget.recognizedId,
-                      refresh: false);
-                },
-                child: const Icon(Icons.close, color: Colors.white70),
-                backgroundColor: Colors.red,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: FloatingActionButton(
-                  heroTag: "send",
-                  onPressed: () async {
-                    Recognizers recognzers = context.read<Recognizers>();
-                    Recognizer? recognizer =
-                        recognzers.getRecognizer(widget.recognizedId);
-                    if (recognizer == null) Navigator.pushNamed(context, "/");
+                  Recognizer? recognizer =
+                      recognzers.getRecognizer(widget.recognizedId);
+                  if (recognizer == null) Navigator.pushNamed(context, "/");
 
-                    String _text = recognizer!
-                        .getSavedTextBlock()
-                        .map((e) => e.text)
-                        .join(" ");
-                    RecognizerNetwork recognizerNetwork =
-                        await RecognizerNetwork.post(_text);
-                  },
-                  child: const Icon(Icons.send)),
-            ),
+                  String _text = recognizer!
+                      .getSavedTextBlock()
+                      .map((e) => e.text)
+                      .join(" ");
+                  RecognizerNetwork recognizerNetwork =
+                      await RecognizerNetwork.post(_text);
+
+                  showAnimatedDialog(
+                    context: context,
+                    barrierDismissible: true,
+                    
+                    builder: (BuildContext context) {
+                      String urlValue =
+                          "${dotenv.env['BACK_URL']!}:${dotenv.env['BACK_PORT']!}/${recognizerNetwork.url}";
+
+                      return ClassicGeneralDialogWidget(
+                        titleText: "Share link",
+                        negativeText: 'close',
+                        positiveText: 'copy',
+                        contentText: urlValue,
+                        onPositiveClick: () async {
+                          ClipboardData data = ClipboardData(text: urlValue);
+                          await Clipboard.setData(data);
+                          Navigator.of(context).pop();
+                        },
+                        onNegativeClick: () {
+                          Navigator.of(context).pop();
+                        },
+                      );
+                    },
+                  );
+                },
+                child: const Icon(Icons.link)),
+            FloatingActionButton(
+                heroTag: "share",
+                onPressed: () async {
+                  Recognizers recognzers = context.read<Recognizers>();
+                  Recognizer? recognizer =
+                      recognzers.getRecognizer(widget.recognizedId);
+                  if (recognizer == null) Navigator.pushNamed(context, "/");
+
+                  String _text = recognizer!
+                      .getSavedTextBlock()
+                      .map((e) => e.text)
+                      .join(" ");
+                  await Share.share(_text);
+                },
+                child: const Icon(Icons.share)),
           ]), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
