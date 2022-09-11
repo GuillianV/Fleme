@@ -45,6 +45,9 @@ dependencies:
   flutter_animated_dialog: ^2.0.1
   fluttertoast: ^8.0.9
   url_launcher: ^6.1.5
+  flutter_quill: ^6.0.0
+  flutter_markdown: ^0.6.10+5
+  markdown_editable_textinput: ^2.0.2
 
 dev_dependencies:
   flutter_test:

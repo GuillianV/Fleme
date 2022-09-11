@@ -6,6 +6,9 @@ import 'package:fleme/models/recognizer.dart';
 import 'package:fleme/models/recognizerNetwork.dart';
 import 'package:fleme/utils/shadow_black.dart';
 import 'package:fleme/views/camera_view.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:markdown_editable_textinput/format_markdown.dart';
+import 'package:markdown_editable_textinput/markdown_text_input.dart';
 import 'package:fleme/widgets/image_resume_widget.dart';
 import 'package:fleme/widgets/morphism_button.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -20,6 +23,9 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import 'package:markdown_editable_textinput/format_markdown.dart';
+import 'package:markdown_editable_textinput/markdown_text_input.dart';
+
 class ImageRecognized extends StatefulWidget {
   const ImageRecognized({super.key, required this.recognizedId});
 
@@ -30,85 +36,160 @@ class ImageRecognized extends StatefulWidget {
 }
 
 class _ImageRecognizedState extends State<ImageRecognized> {
+  bool isTextBlocks = true;
+
   @override
   Widget build(BuildContext context) {
+    String description = '';
+    TextEditingController controller = TextEditingController();
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      body: Column(
-        children: [
-          Column(
-            children: [
-              ImageResume(
-                  width: width,
-                  height: height,
-                  recognizedId: widget.recognizedId),
-              Container(
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.white10,
-                        offset: Offset(2, 2),
-                        blurRadius: 10,
-                        spreadRadius: 1),
-                  ],
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child:
-                          MorphismButton(textValue: "RawText", onTaped: () {}),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: MorphismButton(
-                          textValue: "Text Blocks", onTaped: () {}),
-                    )
-                  ],
-                ),
-              ),
-            ],
-          ),
-          Expanded(
-            child:
-                Consumer<Recognizers>(builder: (context, recognizers, child) {
-              return ListView.builder(
-                shrinkWrap: true,
-                padding: EdgeInsets.zero,
-                scrollDirection: Axis.vertical,
-                physics: ScrollPhysics(),
-                itemCount: recognizers
-                        .getRecognizer(widget.recognizedId)
-                        ?.getSavedTextBlock()
-                        .length ??
-                    0,
-                itemBuilder: (context, index) {
-                  TextBlock textBlock = recognizers
-                      .getRecognizer(widget.recognizedId)!
-                      .getSavedTextBlock()[index];
+    Recognizers recognizers = Provider.of<Recognizers>(context, listen: false);
+    Recognizer? recognizer = recognizers.getRecognizer(widget.recognizedId);
 
-                  return GestureDetector(
-                    onTap: () {},
-                    child: Container(
-                      child: Text(textBlock.text),
-                      padding: const EdgeInsets.all(10.0),
-                      margin: const EdgeInsets.all(5.0),
+    String markdown = '';
+    if (recognizer != null && recognizer!.getMarkedText() == '') {
+      recognizer.getSavedTextBlock().forEach((element) {
+        markdown += element.text;
+      });
+
+      recognizer.setMarkedText(markdown);
+    }
+
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            ImageResume(
+                width: width,
+                height: height,
+                recognizedId: widget.recognizedId),
+            Container(
+              decoration: const BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.white10,
+                      offset: Offset(2, 2),
+                      blurRadius: 10,
+                      spreadRadius: 1),
+                ],
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: MorphismButton(
+                        textValue: "RawText",
+                        onTaped: () {
+                          setState(() {
+                            isTextBlocks = false;
+                          });
+                        }),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: MorphismButton(
+                        textValue: "Text Blocks",
+                        onTaped: () {
+                          setState(() {
+                            isTextBlocks = true;
+                          });
+                        }),
+                  )
+                ],
+              ),
+            ),
+            if (isTextBlocks)
+              Consumer<Recognizers>(builder: (context, recognizers, child) {
+                return ListView.builder(
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  scrollDirection: Axis.vertical,
+                  physics: ScrollPhysics(),
+                  itemCount: recognizers
+                          .getRecognizer(widget.recognizedId)
+                          ?.getSavedTextBlock()
+                          .length ??
+                      0,
+                  itemBuilder: (context, index) {
+                    TextBlock textBlock = recognizers
+                        .getRecognizer(widget.recognizedId)!
+                        .getSavedTextBlock()[index];
+
+                    return GestureDetector(
+                      onTap: () {},
+                      child: Container(
+                        child: Text(textBlock.text),
+                        padding: const EdgeInsets.all(10.0),
+                        margin: const EdgeInsets.all(5.0),
+                        decoration: BoxDecoration(
+                          color: Color.fromARGB(255, 239, 238, 238),
+                          borderRadius: BorderRadius.circular(5),
+                          boxShadow: shadowBlack(),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              }),
+            if (!isTextBlocks)
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    MarkdownTextInput(
+                      (String value) {
+                        Recognizers recognizers = context.read<Recognizers>();
+                        Recognizer? recognizer =
+                            recognizers.getRecognizer(widget.recognizedId);
+                        if (recognizer != null) {
+                          recognizer.setMarkedText(value);
+                          recognizers.refreshRecognizers();
+                        }
+                      },
+                      recognizer!.getMarkedText(),
+                      label: 'Text',
+                      maxLines: 10,
+                      actions: MarkdownType.values,
+                      controller: controller,
+                    ),
+                    Container(
+                      margin: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: Color.fromARGB(255, 239, 238, 238),
                         borderRadius: BorderRadius.circular(5),
                         boxShadow: shadowBlack(),
                       ),
+                      child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: Consumer<Recognizers>(
+                              builder: (context, recognizers, child) {
+                            Recognizer? recognizer =
+                                recognizers.getRecognizer(widget.recognizedId);
+
+                            if (recognizer != null) {
+                              return MarkdownBody(
+                                data: recognizer.getMarkedText(),
+                                shrinkWrap: true,
+                              );
+                            } else
+                              return Container();
+                          })),
                     ),
-                  );
-                },
-              );
-            }),
-          ),
-        ],
+                    SizedBox(
+                      height: 300,
+                    )
+                  ],
+                ),
+              ),
+          ],
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Row(

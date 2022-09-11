@@ -9,6 +9,7 @@ class Recognizer {
   String _filePath = "";
   List<TextBlock> _textBlock = new List.empty(growable: true);
   List<int> _savedTextBlockIds = new List.empty(growable: true);
+  String _markedText = "";
   int widthImage = 0;
   int heightImage = 0;
 
@@ -35,6 +36,15 @@ class Recognizer {
     for (TextBlock block in recognizedText?.blocks ?? []) {
       addTextBlock(block);
     }
+  }
+
+  void setMarkedText(String markedText) {
+    this._markedText = markedText;
+
+  }
+
+  String getMarkedText() {
+    return this._markedText;
   }
 
   void addTextBlock(TextBlock textBlock) {
