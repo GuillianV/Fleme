@@ -5,7 +5,7 @@ import 'package:fleme/models/recognizer.dart';
 import 'package:fleme/models/recognizerNetwork.dart';
 import 'package:fleme/utils/shadow_black.dart';
 import 'package:fleme/widgets/image_resume_widget.dart';
-import 'package:fleme/widgets/saved_bloxk_item.dart';
+import 'package:fleme/widgets/saved_block_item.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
