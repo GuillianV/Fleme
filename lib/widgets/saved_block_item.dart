@@ -1,6 +1,9 @@
+import 'package:fleme/models/providers/recognizer_provider.dart';
+import 'package:fleme/models/recognizer.dart';
 import 'package:fleme/utils/shadow_black.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:provider/provider.dart';
 
 class SavedBlockItem extends StatefulWidget {
   const SavedBlockItem(
@@ -59,7 +62,19 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      Recognizers recognizers =
+                          Provider.of<Recognizers>(context, listen: false);
+                      Recognizer? recognizer =
+                          recognizers.getRecognizer(widget.recognizedId);
+
+                      if (recognizer != null) {
+                        recognizer.removeSavedTextBlock(recognizer
+                            .getTextBlock()
+                            .indexOf(widget.textBlock));
+                        recognizers.refreshRecognizers();
+                      }
+                    },
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Container(

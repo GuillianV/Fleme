@@ -40,7 +40,6 @@ class Recognizer {
 
   void setMarkedText(String markedText) {
     this._markedText = markedText;
-
   }
 
   String getMarkedText() {
@@ -58,6 +57,12 @@ class Recognizer {
   void addSavedTextBlock(int textBlockId) {
     if (!this._savedTextBlockIds.contains(textBlockId)) {
       this._savedTextBlockIds.add(textBlockId);
+    }
+  }
+
+  void removeSavedTextBlock(int textBlockId) {
+    if (this._savedTextBlockIds.contains(textBlockId)) {
+      this._savedTextBlockIds.remove(textBlockId);
     }
   }
 
