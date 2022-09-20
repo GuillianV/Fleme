@@ -9,7 +9,7 @@ class Recognizer {
   String _filePath = "";
   List<TextBlock> _textBlock = new List.empty(growable: true);
   List<int> _savedTextBlockIds = new List.empty(growable: true);
-  String _markedText = "";
+  List<String> _savedTextEdited = new List.empty(growable: true);
   int widthImage = 0;
   int heightImage = 0;
 
@@ -35,15 +35,8 @@ class Recognizer {
         await textRecognizer.processImage(inputImage);
     for (TextBlock block in recognizedText?.blocks ?? []) {
       addTextBlock(block);
+      addSavedTextEdited(block.text);
     }
-  }
-
-  void setMarkedText(String markedText) {
-    this._markedText = markedText;
-  }
-
-  String getMarkedText() {
-    return this._markedText;
   }
 
   void addTextBlock(TextBlock textBlock) {
@@ -72,6 +65,29 @@ class Recognizer {
       savedTextBlock.add(this._textBlock[id]);
     }
     return savedTextBlock;
+  }
+
+  TextBlock? getSavedTextBlockById(int textBlockId) {
+    for (int id in this._savedTextBlockIds) {
+      if (textBlockId == id) return this._textBlock[id];
+    }
+    return null;
+  }
+
+  void addSavedTextEdited(String textEdited) {
+    this._savedTextEdited.add(textEdited);
+  }
+
+  List<String> getSavedTextEdited() {
+    return this._savedTextEdited;
+  }
+
+  String getSavedTextEditedId(int id) {
+    return this._savedTextEdited[id];
+  }
+
+  void editSavedTextEdited(int id, String textEdited) {
+    this._savedTextEdited[id] = textEdited;
   }
 
   String getFilePath() {

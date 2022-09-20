@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:fleme/models/recognizer.dart';
 import 'package:fleme/models/recognizerNetwork.dart';
-import 'package:fleme/utils/shadow_black.dart';
 import 'package:fleme/widgets/image_resume_widget.dart';
 import 'package:fleme/widgets/saved_block_item.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -11,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -65,13 +63,20 @@ class _ImageRecognizedState extends State<ImageRecognized> {
                         .getRecognizer(widget.recognizedId)!
                         .getSavedTextBlock()[index];
 
+                    int textBlockId =
+                        recognizer!.getTextBlock().indexOf(textBlock);
+
                     return SavedBlockItem(
                       recognizedId: widget.recognizedId,
-                      textBlock: textBlock,
+                      textBlockId: textBlockId,
+                      text: recognizer?.getSavedTextEditedId(textBlockId) ?? "",
                     );
                   },
                 );
               }),
+            Container(
+              height: 200,
+            )
           ],
         ),
       ),

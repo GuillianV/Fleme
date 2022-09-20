@@ -152,6 +152,7 @@ class _ImageFilterState extends State<ImageFilter> {
 
   void saveTextBlock(BuildContext context, int textBlockId) {
     recognizer!.addSavedTextBlock(textBlockId);
+
     Provider.of<Recognizers>(context, listen: false).refreshRecognizers();
   }
 }

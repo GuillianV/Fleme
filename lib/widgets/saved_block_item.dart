@@ -1,16 +1,21 @@
 import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:fleme/models/recognizer.dart';
 import 'package:fleme/utils/shadow_black.dart';
+import 'package:fleme/views/image_filter_view.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:provider/provider.dart';
 
 class SavedBlockItem extends StatefulWidget {
   const SavedBlockItem(
-      {super.key, required this.recognizedId, required this.textBlock});
+      {super.key,
+      required this.recognizedId,
+      required this.textBlockId,
+      required this.text});
 
   final int recognizedId;
-  final TextBlock textBlock;
+  final int textBlockId;
+  final String text;
 
   @override
   State<SavedBlockItem> createState() => _SavedBlockItemState();
@@ -23,15 +28,10 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown: (details) {
+      onTap: () {
         setState(() {
-          isTaped = true;
+          isTaped = !isTaped;
           isExpanded = !isExpanded;
-        });
-      },
-      onTapUp: (details) {
-        setState(() {
-          isTaped = false;
         });
       },
       child: AnimatedContainer(
@@ -44,19 +44,18 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
           boxShadow: shadowBlack(),
         ),
         child: Column(children: [
-          Text(widget.textBlock.text),
-          const Divider(
-            height: 10,
-            thickness: 1,
-            indent: 30,
-            endIndent: 30,
-            color: Colors.black,
-          ),
+          Text(widget.text),
           if (!isExpanded)
-            Icon(Icons.add)
+            Icon(
+              Icons.add,
+              size: 10,
+            )
           else
             Column(children: [
-              Icon(Icons.remove),
+              Icon(
+                Icons.remove,
+                size: 10,
+              ),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -69,9 +68,7 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
                           recognizers.getRecognizer(widget.recognizedId);
 
                       if (recognizer != null) {
-                        recognizer.removeSavedTextBlock(recognizer
-                            .getTextBlock()
-                            .indexOf(widget.textBlock));
+                        recognizer.removeSavedTextBlock(widget.textBlockId);
                         recognizers.refreshRecognizers();
                       }
                     },
@@ -89,7 +86,15 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
                     ),
                   ),
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      if (recognizer != null) {
+                        Navigator.pushNamed(context, "/textBlock_edit",
+                            arguments: {
+                              "recognizedId": widget.recognizedId,
+                              "textBlockId": widget.textBlockId
+                            });
+                      }
+                    },
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Container(

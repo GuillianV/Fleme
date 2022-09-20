@@ -6,6 +6,7 @@ import 'package:fleme/views/camera_view.dart';
 import 'package:fleme/views/homepage_view.dart';
 import 'package:fleme/views/image_filter_view.dart';
 import 'package:fleme/views/image_recognized_view.dart';
+import 'package:fleme/views/text_block_edit_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
@@ -39,7 +40,6 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        
       ),
       routes: {
         '/': (context) => const MyHomePage(title: 'Fleme'),
@@ -56,6 +56,13 @@ class MyApp extends StatelessWidget {
         } else if (settings.name == '/camera') {
           final value = settings.arguments as List<CameraDescription>;
           return MaterialPageRoute(builder: (_) => CameraPage(cameras: value));
+        } else if (settings.name == '/textBlock_edit') {
+          Map data = settings.arguments! as Map;
+          final recognizedId = data["recognizedId"] as int;
+          final textBlockId = data["textBlockId"] as int;
+          return MaterialPageRoute(
+              builder: (_) => TextBlockEdit(
+                  RecognizedId: recognizedId, TextBlockId: textBlockId));
         }
 
         return null;
