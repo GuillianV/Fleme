@@ -39,7 +39,13 @@ class RecognizerNetwork {
   static Future<RecognizerNetwork> post(_text) async {
     String? url = dotenv.env['BACK_URL'] ?? "127.0.0.1";
     String? port = dotenv.env['BACK_PORT'] ?? "3000";
-    Uri uri = Uri.http("$url:$port", "/recognize", {"text": _text});
+    late Uri uri;
+    if (dotenv.env["BACK_SECURED"]! == 'false') {
+      uri = Uri.http("$url:$port", "/recognize", {"text": _text});
+    } else if (dotenv.env["BACK_SECURED"]! == 'true') {
+      uri = Uri.https("$url", "/recognize", {"text": _text});
+    }
+
     var result = await http.post(uri);
     var decodeReesp = jsonDecode(result.body);
     return RecognizerNetwork.fromJson(decodeReesp);
