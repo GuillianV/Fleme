@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:fleme/models/recognizer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:provider/provider.dart';
 
@@ -29,6 +30,21 @@ double aspectRationHeight = 1;
 class _ImageFilterState extends State<ImageFilter> {
   @override
   Widget build(BuildContext context) {
+    final bool isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+
+    if (isLandscape) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.landscapeRight,
+        DeviceOrientation.landscapeLeft,
+      ]);
+    } else {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+      ]);
+    }
+
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
 
@@ -52,10 +68,10 @@ class _ImageFilterState extends State<ImageFilter> {
           child: Listener(
             onPointerMove: (event) {
               TextBlock? textBlock = recognizer!.findTextBlockByCoordonates(
-                  event.position.dx * aspectRationWidth,
-                  event.position.dy * aspectRationHeight);
+                  event.localPosition.dx * aspectRationWidth,
+                  event.localPosition.dy * aspectRationHeight);
               if (textBlock != null) {
-                saveTextBlock(
+                toggleTextBlockvoid(
                     context, recognizer!.getTextBlock().indexOf(textBlock));
               }
             },
@@ -64,7 +80,9 @@ class _ImageFilterState extends State<ImageFilter> {
                 borderRadius: BorderRadius.all(Radius.circular(10)),
                 image: DecorationImage(
                   fit: BoxFit.cover,
-                  image: Image.file(File(recognizer!.getFilePath())).image,
+                  image: Image.file(
+                    File(recognizer!.getFilePath()),
+                  ).image,
                 ),
               ),
               child: Stack(
@@ -118,13 +136,7 @@ class _ImageFilterState extends State<ImageFilter> {
               width: textBlock.boundingBox.width.toDouble() / aspectRationWidth,
               height:
                   textBlock.boundingBox.height.toDouble() / aspectRationHeight,
-              child: GestureDetector(onTap: () {
-                saveTextBlock(
-                    context, recognizer!.getTextBlock().indexOf(textBlock));
-              }, onPanUpdate: (details) {
-                saveTextBlock(
-                    context, recognizer!.getTextBlock().indexOf(textBlock));
-              }, child:
+              child:
                   Consumer<Recognizers>(builder: (context, recognizers, child) {
                 bool isSaved =
                     recognizer!.getSavedTextBlock().contains(textBlock);
@@ -143,15 +155,20 @@ class _ImageFilterState extends State<ImageFilter> {
                     ),
                   ),
                 );
-              })),
+              }),
             ))
         .toList();
 
     return positioned;
   }
 
-  void saveTextBlock(BuildContext context, int textBlockId) {
-    recognizer!.addSavedTextBlock(textBlockId);
+  void toggleTextBlockvoid(BuildContext context, int textBlockId) {
+    TextBlock? textBlock = recognizer!.getSavedTextBlockById(textBlockId);
+    if (textBlock != null) {
+      recognizer!.removeSavedTextBlock(textBlockId);
+    } else {
+      recognizer!.addSavedTextBlock(textBlockId);
+    }
 
     Provider.of<Recognizers>(context, listen: false).refreshRecognizers();
   }

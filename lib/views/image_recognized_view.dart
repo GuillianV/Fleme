@@ -193,10 +193,11 @@ class _ImageRecognizedState extends State<ImageRecognized> {
                       recognzers.getRecognizer(widget.recognizedId);
                   if (recognizer == null) Navigator.pushNamed(context, "/");
 
-                  String _text = recognizer!
-                      .getSavedTextBlock()
-                      .map((e) => e.text)
-                      .join(" ");
+                  String _text = "";
+                  recognizer!.getSavedTextBlock()?.forEach((element) {
+                    int index = recognizer.getTextBlock().indexOf(element);
+                    _text += recognizer.getSavedTextEditedId(index) + "\n";
+                  });
                   await Share.share(_text);
                 },
                 child: const Icon(Icons.share)),
@@ -204,3 +205,5 @@ class _ImageRecognizedState extends State<ImageRecognized> {
     );
   }
 }
+
+

@@ -20,6 +20,8 @@ class CameraPage extends StatefulWidget {
 }
 
 class _CameraPageState extends State<CameraPage> {
+  bool cameraInitialized = true;
+
   late CameraController controller;
   XFile? pictureFile;
   double controllerRatio = 1.0;
@@ -35,6 +37,12 @@ class _CameraPageState extends State<CameraPage> {
   @override
   void initState() {
     super.initState();
+
+    if (widget.cameras == null || widget.cameras!.isEmpty) {
+      cameraInitialized = false;
+      return;
+    }
+
     controller = CameraController(
       widget.cameras![0],
       ResolutionPreset.max,
@@ -82,6 +90,7 @@ class _CameraPageState extends State<CameraPage> {
       controllerRatio = (controller.value.previewSize?.height ?? 1) /
           (controller.value.previewSize?.width ?? 1);
     }
+    if (!cameraInitialized) Navigator.pop(context);
 
     if (!controller.value.isInitialized) {
       return const SizedBox(
@@ -104,7 +113,7 @@ class _CameraPageState extends State<CameraPage> {
                   aspectRatio: controllerRatio,
                   child: GestureDetector(
                     onVerticalDragUpdate: (details) {
-                      if (details.delta.dy > 0 && zoom < maxZoomLevel) {
+                      if (details.delta.dy < 0 && zoom < maxZoomLevel) {
                         setState(() {
                           zoom = zoom + 0.1;
                           if (zoom > maxZoomLevel) zoom = maxZoomLevel;
@@ -112,7 +121,7 @@ class _CameraPageState extends State<CameraPage> {
                         });
                       }
 
-                      if (details.delta.dy < 0 && zoom > 1.0) {
+                      if (details.delta.dy > 0 && zoom > 1.0) {
                         setState(() {
                           zoom = zoom - 0.1;
                           if (zoom < 1.0) zoom = 1;

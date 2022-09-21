@@ -28,10 +28,12 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          await availableCameras().then((value) =>
-              Navigator.pushNamed(context, '/camera', arguments: value));
+          await availableCameras()
+              .then((value) =>
+                  Navigator.pushNamed(context, '/camera', arguments: value))
+              .catchError((onError) => Navigator.pop(context));
         },
-        tooltip: 'Picture',
+        tooltip: 'Scan text',
         child: const Icon(Icons.image),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );

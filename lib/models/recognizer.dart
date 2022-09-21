@@ -12,6 +12,7 @@ class Recognizer {
   List<String> _savedTextEdited = new List.empty(growable: true);
   int widthImage = 0;
   int heightImage = 0;
+  bool timed = false;
 
   Recognizer(this._filePath);
 

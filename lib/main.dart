@@ -8,6 +8,7 @@ import 'package:fleme/views/image_filter_view.dart';
 import 'package:fleme/views/image_recognized_view.dart';
 import 'package:fleme/views/text_block_edit_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 
@@ -45,6 +46,13 @@ class MyApp extends StatelessWidget {
         '/': (context) => const MyHomePage(title: 'Fleme'),
       },
       onGenerateRoute: (settings) {
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.landscapeRight,
+          DeviceOrientation.landscapeLeft,
+          DeviceOrientation.portraitUp,
+          DeviceOrientation.portraitDown,
+        ]);
+
         if (settings.name == '/image_filter') {
           final value = settings.arguments as int;
           return MaterialPageRoute(
