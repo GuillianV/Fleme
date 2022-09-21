@@ -129,39 +129,35 @@ class _ImageFilterState extends State<ImageFilter> {
   List<Widget> showPositioned(BuildContext context, int recognizedId) {
     List<Widget> positioned = List.empty(growable: true);
 
-    positioned = recognizer!
-        .getBlockRecognized()
-        .map((textBlock) => Positioned(
-              left: textBlock.getBoundingBox().left.toDouble() /
-                  aspectRationWidth,
-              top: textBlock.getBoundingBox().top.toDouble() /
-                  aspectRationHeight,
-              width: textBlock.getBoundingBox().width.toDouble() /
-                  aspectRationWidth,
-              height: textBlock.getBoundingBox().height.toDouble() /
-                  aspectRationHeight,
-              child:
-                  Consumer<Recognizers>(builder: (context, recognizers, child) {
-                bool isSaved =
-                    recognizer!.getSavedTextBlock().contains(textBlock);
+    recognizer!.getBlockRecognized()?.forEach((blockRecognized) {
+      Rect rect = blockRecognized.getBoundingBox();
 
-                return IgnorePointer(
-                  ignoring: isSaved,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: !isSaved
-                          ? const Color.fromARGB(30, 16, 16, 16)
-                          : const Color.fromARGB(125, 255, 255, 255),
-                      borderRadius: BorderRadius.circular(5),
-                      border: Border.all(
-                          color: Colors.white, width: 0.5 // red as border color
-                          ),
+      positioned.add(Positioned(
+        left: rect.left.toDouble() / aspectRationWidth,
+        top: rect.top.toDouble() / aspectRationHeight,
+        width: rect.width.toDouble() / aspectRationWidth,
+        height: rect.height.toDouble() / aspectRationHeight,
+        child: Consumer<Recognizers>(builder: (context, recognizers, child) {
+          bool isSaved =
+              recognizer!.getSavedTextBlock().contains(blockRecognized);
+
+          return GestureDetector(
+            onTap: () => toggleTextBlockvoid(context, blockRecognized.id),
+            child: Container(
+              decoration: BoxDecoration(
+                color: !isSaved
+                    ? const Color.fromARGB(30, 16, 16, 16)
+                    : const Color.fromARGB(125, 255, 255, 255),
+                borderRadius: BorderRadius.circular(5),
+                border: Border.all(
+                    color: Colors.white, width: 0.5 // red as border color
                     ),
-                  ),
-                );
-              }),
-            ))
-        .toList();
+              ),
+            ),
+          );
+        }),
+      ));
+    });
 
     return positioned;
   }
@@ -172,7 +168,18 @@ class _ImageFilterState extends State<ImageFilter> {
     if (recognizerblock == null) {
       return;
     }
-    recognizerblock.toggleSave();
-    Provider.of<Recognizers>(context, listen: false).refreshRecognizers();
+
+    if (!recognizerblock.getTimed()) {
+      timedBlock(recognizerblock);
+      recognizerblock.toggleSave();
+      Provider.of<Recognizers>(context, listen: false).refreshRecognizers();
+    }
+  }
+
+  void timedBlock(Recognizerblock recognizerblock) async {
+    recognizerblock.busy();
+    await Future.delayed(const Duration(milliseconds: 200), () {
+      recognizerblock.free();
+    });
   }
 }

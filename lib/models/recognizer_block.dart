@@ -54,6 +54,10 @@ class Recognizerblock {
     this._timed = !this._timed;
   }
 
+  bool getTimed() {
+    return this._timed;
+  }
+
   //Default text
   String getDefaultTextEdited() {
     return this._defaultTextEdited;
