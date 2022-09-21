@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:fleme/models/recognizer.dart';
+import 'package:fleme/models/recognizer_block.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
@@ -67,12 +68,12 @@ class _ImageFilterState extends State<ImageFilter> {
           height: containerHeight,
           child: Listener(
             onPointerMove: (event) {
-              TextBlock? textBlock = recognizer!.findTextBlockByCoordonates(
-                  event.localPosition.dx * aspectRationWidth,
-                  event.localPosition.dy * aspectRationHeight);
+              Recognizerblock? textBlock = recognizer!
+                  .findTextBlockByCoordonates(
+                      event.localPosition.dx * aspectRationWidth,
+                      event.localPosition.dy * aspectRationHeight);
               if (textBlock != null) {
-                toggleTextBlockvoid(
-                    context, recognizer!.getTextBlock().indexOf(textBlock));
+                toggleTextBlockvoid(context, textBlock.id);
               }
             },
             child: Container(
@@ -129,13 +130,16 @@ class _ImageFilterState extends State<ImageFilter> {
     List<Widget> positioned = List.empty(growable: true);
 
     positioned = recognizer!
-        .getTextBlock()
+        .getBlockRecognized()
         .map((textBlock) => Positioned(
-              left: textBlock.boundingBox.left.toDouble() / aspectRationWidth,
-              top: textBlock.boundingBox.top.toDouble() / aspectRationHeight,
-              width: textBlock.boundingBox.width.toDouble() / aspectRationWidth,
-              height:
-                  textBlock.boundingBox.height.toDouble() / aspectRationHeight,
+              left: textBlock.getBoundingBox().left.toDouble() /
+                  aspectRationWidth,
+              top: textBlock.getBoundingBox().top.toDouble() /
+                  aspectRationHeight,
+              width: textBlock.getBoundingBox().width.toDouble() /
+                  aspectRationWidth,
+              height: textBlock.getBoundingBox().height.toDouble() /
+                  aspectRationHeight,
               child:
                   Consumer<Recognizers>(builder: (context, recognizers, child) {
                 bool isSaved =
@@ -163,13 +167,12 @@ class _ImageFilterState extends State<ImageFilter> {
   }
 
   void toggleTextBlockvoid(BuildContext context, int textBlockId) {
-    TextBlock? textBlock = recognizer!.getSavedTextBlockById(textBlockId);
-    if (textBlock != null) {
-      recognizer!.removeSavedTextBlock(textBlockId);
-    } else {
-      recognizer!.addSavedTextBlock(textBlockId);
+    Recognizerblock? recognizerblock =
+        recognizer!.getBlockRecognizedById(textBlockId);
+    if (recognizerblock == null) {
+      return;
     }
-
+    recognizerblock.toggleSave();
     Provider.of<Recognizers>(context, listen: false).refreshRecognizers();
   }
 }

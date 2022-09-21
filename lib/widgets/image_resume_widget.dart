@@ -36,7 +36,8 @@ class ImageResume extends StatelessWidget {
         ),
         // ignore: unnecessary_null_comparison
         child: recognizers.exists(recognizedId) != null
-            ? BlurTitle(text: "${recognizer!.getTextBlock().length} blocks")
+            ? BlurTitle(
+                text: "${recognizer!.getBlockRecognized().length} blocks")
             : null,
       );
     });

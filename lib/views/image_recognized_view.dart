@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:fleme/models/recognizer.dart';
 import 'package:fleme/models/recognizerNetwork.dart';
+import 'package:fleme/models/recognizer_block.dart';
 import 'package:fleme/widgets/image_resume_widget.dart';
 import 'package:fleme/widgets/saved_block_item.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -59,17 +60,14 @@ class _ImageRecognizedState extends State<ImageRecognized> {
                           .length ??
                       0,
                   itemBuilder: (context, index) {
-                    TextBlock textBlock = recognizers
+                    Recognizerblock textBlock = recognizers
                         .getRecognizer(widget.recognizedId)!
                         .getSavedTextBlock()[index];
 
-                    int textBlockId =
-                        recognizer!.getTextBlock().indexOf(textBlock);
-
                     return SavedBlockItem(
                       recognizedId: widget.recognizedId,
-                      textBlockId: textBlockId,
-                      text: recognizer?.getSavedTextEditedId(textBlockId) ?? "",
+                      textBlockId: textBlock.id,
+                      text: textBlock.getTextEdited() ?? "",
                     );
                   },
                 );
@@ -141,8 +139,7 @@ class _ImageRecognizedState extends State<ImageRecognized> {
 
                   String _text = "";
                   recognizer!.getSavedTextBlock()?.forEach((element) {
-                    int index = recognizer.getTextBlock().indexOf(element);
-                    _text += recognizer.getSavedTextEditedId(index) + "\n";
+                    _text += element.getTextEdited() + "\n";
                   });
                   RecognizerNetwork recognizerNetwork =
                       await RecognizerNetwork.post(_text);
@@ -195,8 +192,7 @@ class _ImageRecognizedState extends State<ImageRecognized> {
 
                   String _text = "";
                   recognizer!.getSavedTextBlock()?.forEach((element) {
-                    int index = recognizer.getTextBlock().indexOf(element);
-                    _text += recognizer.getSavedTextEditedId(index) + "\n";
+                    _text += element.getTextEdited() + "\n";
                   });
                   await Share.share(_text);
                 },
@@ -205,5 +201,3 @@ class _ImageRecognizedState extends State<ImageRecognized> {
     );
   }
 }
-
-

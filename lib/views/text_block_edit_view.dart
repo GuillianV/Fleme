@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:fleme/models/recognizer.dart';
+import 'package:fleme/models/recognizer_block.dart';
 import 'package:fleme/utils/shadow_black.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
@@ -25,11 +26,11 @@ class _TextBlockEditState extends State<TextBlockEdit> {
   Widget build(BuildContext context) {
     Recognizers recognizers = context.read<Recognizers>();
     Recognizer? recognizer = recognizers.getRecognizer(widget.RecognizedId);
-    TextBlock? textBlock =
+    Recognizerblock? textBlock =
         recognizer!.getSavedTextBlockById(widget.TextBlockId);
 
     TextEditingController txtController = TextEditingController();
-    txtController.text = recognizer.getSavedTextEditedId(widget.TextBlockId);
+    txtController.text = textBlock.getTextEdited();
 
     return Scaffold(
       body: Center(
@@ -73,7 +74,7 @@ class _TextBlockEditState extends State<TextBlockEdit> {
                     keyboardType: TextInputType.multiline,
                     autocorrect: true,
                     onChanged: (value) {
-                      recognizer.editSavedTextEdited(widget.TextBlockId, value);
+                      textBlock.setTextEdited(value);
                     },
                     style: GoogleFonts.poppins(
                         textStyle:

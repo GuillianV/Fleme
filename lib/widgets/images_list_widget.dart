@@ -80,7 +80,7 @@ class ImagesList extends StatelessWidget {
                     ),
                     child: BlurTitle(
                         text:
-                            "${recognizerCible.getTextBlock().length} Blocks"),
+                            "${recognizerCible.getBlockRecognized().length} Blocks"),
                   ),
                 );
               },

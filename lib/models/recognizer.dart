@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:fleme/models/providers/picture_provider.dart';
+import 'package:fleme/models/recognizer_block.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
@@ -7,12 +8,9 @@ import 'package:provider/provider.dart';
 
 class Recognizer {
   String _filePath = "";
-  List<TextBlock> _textBlock = new List.empty(growable: true);
-  List<int> _savedTextBlockIds = new List.empty(growable: true);
-  List<String> _savedTextEdited = new List.empty(growable: true);
+  List<Recognizerblock> _blockRecognized = new List.empty(growable: true);
   int widthImage = 0;
   int heightImage = 0;
-  bool timed = false;
 
   Recognizer(this._filePath);
 
@@ -36,72 +34,71 @@ class Recognizer {
         await textRecognizer.processImage(inputImage);
     for (TextBlock block in recognizedText?.blocks ?? []) {
       addTextBlock(block);
-      addSavedTextEdited(block.text);
     }
+  }
+
+  bool _RecognizerblockExist(int id) {
+    for (Recognizerblock block in _blockRecognized) {
+      if (block.id == id) {
+        return true;
+      }
+    }
+    return false;
   }
 
   void addTextBlock(TextBlock textBlock) {
-    this._textBlock.add(textBlock);
+    this
+        ._blockRecognized
+        .add(Recognizerblock.create(_blockRecognized.length, textBlock));
   }
 
-  List<TextBlock> getTextBlock() {
-    return this._textBlock;
-  }
-
-  void addSavedTextBlock(int textBlockId) {
-    if (!this._savedTextBlockIds.contains(textBlockId)) {
-      this._savedTextBlockIds.add(textBlockId);
+  void saveTextBlock(int recognizerblockId) {
+    if (_RecognizerblockExist(recognizerblockId)) {
+      _blockRecognized[recognizerblockId].save();
     }
   }
 
-  void removeSavedTextBlock(int textBlockId) {
-    if (this._savedTextBlockIds.contains(textBlockId)) {
-      this._savedTextBlockIds.remove(textBlockId);
+  void unsaveTextBlock(int recognizerblockId) {
+    if (_RecognizerblockExist(recognizerblockId)) {
+      _blockRecognized[recognizerblockId].unsave();
     }
   }
 
-  List<TextBlock> getSavedTextBlock() {
-    List<TextBlock> savedTextBlock = new List.empty(growable: true);
-    for (int id in this._savedTextBlockIds) {
-      savedTextBlock.add(this._textBlock[id]);
-    }
-    return savedTextBlock;
+  List<Recognizerblock> getBlockRecognized() {
+    return this._blockRecognized;
   }
 
-  TextBlock? getSavedTextBlockById(int textBlockId) {
-    for (int id in this._savedTextBlockIds) {
-      if (textBlockId == id) return this._textBlock[id];
-    }
-    return null;
+  Recognizerblock? getBlockRecognizedById(int id) {
+    if (_RecognizerblockExist(id))
+      return this._blockRecognized[id];
+    else
+      return null;
   }
 
-  void addSavedTextEdited(String textEdited) {
-    this._savedTextEdited.add(textEdited);
+  List<Recognizerblock> getSavedTextBlock() {
+    return _blockRecognized
+        .where((blockRecognized) => blockRecognized.isSaved())
+        .toList();
   }
 
-  List<String> getSavedTextEdited() {
-    return this._savedTextEdited;
-  }
-
-  String getSavedTextEditedId(int id) {
-    return this._savedTextEdited[id];
-  }
-
-  void editSavedTextEdited(int id, String textEdited) {
-    this._savedTextEdited[id] = textEdited;
+  Recognizerblock getSavedTextBlockById(int recognizerblockId) {
+    return _blockRecognized.firstWhere((blockRecognized) =>
+        blockRecognized.isSaved() && recognizerblockId == blockRecognized.id);
   }
 
   String getFilePath() {
     return this._filePath;
   }
 
-  TextBlock? findTextBlockByCoordonates(double x, double y) {
-    for (TextBlock textBlock in this._textBlock) {
-      if (x > textBlock.boundingBox.left &&
-          x < textBlock.boundingBox.right &&
-          y > textBlock.boundingBox.top &&
-          y < textBlock.boundingBox.bottom) {
-        return textBlock;
+  Recognizerblock? findTextBlockByCoordonates(double x, double y) {
+    for (Recognizerblock recognizerblock in this._blockRecognized) {
+      Rect recognizerblockRect = recognizerblock.getBoundingBox();
+
+      if (x > recognizerblockRect.left &&
+          x < recognizerblockRect.right &&
+          y > recognizerblockRect.top &&
+          y < recognizerblockRect.bottom) {
+        return recognizerblock;
       }
     }
     return null;

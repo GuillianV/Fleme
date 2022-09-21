@@ -68,7 +68,9 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
                           recognizers.getRecognizer(widget.recognizedId);
 
                       if (recognizer != null) {
-                        recognizer.removeSavedTextBlock(widget.textBlockId);
+                        recognizer
+                            .getBlockRecognizedById(widget.textBlockId)
+                            ?.unsave();
                         recognizers.refreshRecognizers();
                       }
                     },
