@@ -4,7 +4,6 @@ import 'package:fleme/models/recognizer.dart';
 import 'package:fleme/models/recognizer_block.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:provider/provider.dart';
 
 class ImageFilter extends StatefulWidget {

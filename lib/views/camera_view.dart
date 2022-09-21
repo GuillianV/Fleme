@@ -1,9 +1,6 @@
 import 'dart:io';
-import 'package:fleme/main.dart';
 import 'package:fleme/models/providers/picture_provider.dart';
 import 'package:fleme/models/recognizer.dart';
-import 'package:fleme/views/homepage_view.dart';
-import 'package:fleme/views/image_filter_view.dart';
 import 'package:fleme/widgets/morphism_button.dart';
 import 'package:provider/provider.dart';
 import 'package:camera/camera.dart';

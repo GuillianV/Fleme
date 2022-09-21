@@ -11,7 +11,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -90,8 +89,8 @@ class _ImageRecognizedState extends State<ImageRecognized> {
                 // recognzers.removeRecognizerById(widget.recognizedId);
                 Navigator.pushNamed(context, "/");
               },
-              child: const Icon(Icons.home, color: Colors.black87),
               backgroundColor: Colors.white,
+              child: const Icon(Icons.home, color: Colors.black87),
             ),
             FloatingActionButton(
               heroTag: "delete_image_r",

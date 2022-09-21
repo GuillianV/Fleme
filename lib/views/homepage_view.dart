@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:camera/camera.dart';
-import 'package:fleme/views/camera_view.dart';
 import 'package:fleme/widgets/images_list_widget.dart';
 import 'package:flutter/material.dart';
 

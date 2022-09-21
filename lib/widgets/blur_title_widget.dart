@@ -1,9 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
-import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 
 class BlurTitle extends StatelessWidget {
   const BlurTitle({

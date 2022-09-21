@@ -1,8 +1,6 @@
 import 'dart:io';
 import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:fleme/models/recognizer.dart';
-import 'package:fleme/views/image_filter_view.dart';
-import 'package:fleme/views/image_recognized_view.dart';
 import 'package:fleme/widgets/blur_title_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -18,36 +16,33 @@ class ImagesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
 
     return Consumer<Recognizers>(builder: (context, recognizers, child) {
       return recognizers.getRecognizers().isEmpty
-          ? Container(
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset("assets/images/fleme.png"),
-                    Text("Fleme".toUpperCase() + " Application !",
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                  Image.asset("assets/images/fleme.png"),
+                  Text("${"Fleme".toUpperCase()} Application !",
+                      style: GoogleFonts.poppins(
+                          textStyle: const TextStyle(fontSize: 25))),
+                  Padding(
+                    padding:
+                        EdgeInsets.fromLTRB(width * 0.2, 0, width * 0.2, 0),
+                    child: Text(
+                        "Scannez votre environnement pour détecter du text et vous l'envoyer. Appuyez sur le bouton en bas a droite pour commencer !",
+                        textAlign: TextAlign.center,
                         style: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 25))),
-                    Padding(
-                      padding:
-                          EdgeInsets.fromLTRB(width * 0.2, 0, width * 0.2, 0),
-                      child: Text(
-                          "Scannez votre environnement pour détecter du text et vous l'envoyer. Appuyez sur le bouton en bas a droite pour commencer !",
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.poppins(
-                              textStyle: TextStyle(
-                                  fontSize: 12, letterSpacing: -0.5))),
-                    )
-                  ]),
-            )
+                            textStyle: const TextStyle(
+                                fontSize: 12, letterSpacing: -0.5))),
+                  )
+                ])
           : ListView.builder(
               shrinkWrap: true,
               padding: EdgeInsets.zero,
               scrollDirection: Axis.vertical,
-              physics: ScrollPhysics(),
+              physics: const ScrollPhysics(),
               itemCount: recognizers.getRecognizers().length,
               itemBuilder: (context, index) {
                 Recognizer? recognizerCible = recognizers.getRecognizer(index);

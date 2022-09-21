@@ -3,7 +3,6 @@ import 'package:fleme/models/recognizer.dart';
 import 'package:fleme/utils/shadow_black.dart';
 import 'package:fleme/views/image_filter_view.dart';
 import 'package:flutter/material.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:provider/provider.dart';
 
 class SavedBlockItem extends StatefulWidget {
@@ -39,20 +38,22 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
         padding: const EdgeInsets.all(10.0),
         margin: const EdgeInsets.all(5.0),
         decoration: BoxDecoration(
-          color: !isTaped ? Color.fromARGB(255, 239, 238, 238) : Colors.white,
+          color: !isTaped
+              ? const Color.fromARGB(255, 239, 238, 238)
+              : Colors.white,
           borderRadius: BorderRadius.circular(5),
           boxShadow: shadowBlack(),
         ),
         child: Column(children: [
           Text(widget.text),
           if (!isExpanded)
-            Icon(
+            const Icon(
               Icons.add,
               size: 10,
             )
           else
             Column(children: [
-              Icon(
+              const Icon(
                 Icons.remove,
                 size: 10,
               ),
@@ -79,11 +80,11 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
                       child: Container(
                         width: 50,
                         height: 50,
-                        child: Icon(Icons.delete),
                         decoration: BoxDecoration(
-                            color: Colors.red,
+                            color: const Color.fromARGB(255, 255, 126, 117),
                             boxShadow: shadowBlack(),
                             borderRadius: BorderRadius.circular(15)),
+                        child: const Icon(Icons.delete),
                       ),
                     ),
                   ),
@@ -102,12 +103,11 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
                       child: Container(
                         width: 50,
                         height: 50,
-                        child: Icon(Icons.settings_ethernet_rounded,
-                            color: Colors.white),
                         decoration: BoxDecoration(
-                            color: Colors.blueAccent,
+                            color: const Color.fromARGB(255, 129, 175, 255),
                             boxShadow: shadowBlack(),
                             borderRadius: BorderRadius.circular(15)),
+                        child: const Icon(Icons.mode_edit, color: Colors.white),
                       ),
                     ),
                   )

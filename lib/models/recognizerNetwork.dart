@@ -1,9 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:fleme/models/providers/picture_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import "package:http/http.dart" as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 

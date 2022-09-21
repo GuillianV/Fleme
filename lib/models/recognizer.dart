@@ -1,10 +1,7 @@
 import 'dart:io';
-import 'package:fleme/models/providers/picture_provider.dart';
 import 'package:fleme/models/recognizer_block.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
-import 'package:provider/provider.dart';
 
 class Recognizer {
   String _filePath = "";

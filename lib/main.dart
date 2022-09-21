@@ -70,7 +70,7 @@ class MyApp extends StatelessWidget {
           final textBlockId = data["textBlockId"] as int;
           return MaterialPageRoute(
               builder: (_) => TextBlockEdit(
-                  RecognizedId: recognizedId, TextBlockId: textBlockId));
+                  recognizedId: recognizedId, textBlockId: textBlockId));
         }
 
         return null;
