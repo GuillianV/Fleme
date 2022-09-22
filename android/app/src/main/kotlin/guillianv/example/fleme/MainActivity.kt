@@ -1,4 +1,4 @@
-package com.example.fleme
+package com.guillianv.fleme
 
 import io.flutter.embedding.android.FlutterActivity
 

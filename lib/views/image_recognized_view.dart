@@ -72,7 +72,7 @@ class _ImageRecognizedState extends State<ImageRecognized> {
                 );
               }),
             Container(
-              height: 200,
+              height: 100,
             )
           ],
         ),

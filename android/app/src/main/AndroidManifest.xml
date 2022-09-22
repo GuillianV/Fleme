@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.fleme">
+    package="com.guillianv.fleme">
    <application
         android:label="fleme"
         android:name="${applicationName}"

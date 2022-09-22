@@ -177,7 +177,7 @@ class _ImageFilterState extends State<ImageFilter> {
 
   void timedBlock(Recognizerblock recognizerblock) async {
     recognizerblock.busy();
-    await Future.delayed(const Duration(milliseconds: 200), () {
+    await Future.delayed(const Duration(milliseconds: 500), () {
       recognizerblock.free();
     });
   }
