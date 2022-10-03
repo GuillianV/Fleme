@@ -1,4 +1,4 @@
-import 'package:fleme/widgets/images_list_widget.dart';
+import 'package:fleme/widgets/list_widget.dart';
 import 'package:flutter/material.dart';
 
 class ListPage extends StatefulWidget {
@@ -13,13 +13,11 @@ class ListPage extends StatefulWidget {
 class _ListPageState extends State<ListPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[ImagesList()],
-          ),
+    return Center(
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const <Widget>[ScanList()],
         ),
       ),
     );

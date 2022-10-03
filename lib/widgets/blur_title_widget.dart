@@ -1,5 +1,5 @@
-import 'dart:io';
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -13,6 +13,8 @@ class BlurTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(5),
       clipBehavior: Clip.antiAlias,
@@ -22,12 +24,10 @@ class BlurTitle extends StatelessWidget {
           sigmaY: 2.0,
         ),
         child: Center(
-          child: Text("$text",
+          child: Text(text,
               style: GoogleFonts.poppins(
-                  textStyle: const TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white70))),
+                  textStyle: theme.textTheme.headline5!
+                      .copyWith(fontWeight: FontWeight.w700, color: Colors.white70))),
         ),
       ),
     );

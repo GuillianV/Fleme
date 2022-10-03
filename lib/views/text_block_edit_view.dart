@@ -1,14 +1,12 @@
-import 'dart:convert';
-import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:fleme/models/recognizer.dart';
 import 'package:fleme/models/recognizer_block.dart';
-import 'package:fleme/utils/shadow_black.dart';
+import 'package:fleme/theme/box_shadow.dart';
+import 'package:fleme/views/image_filter_view.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:fleme/views/image_filter_view.dart';
 
 class TextBlockEdit extends StatefulWidget {
   const TextBlockEdit(
@@ -44,7 +42,7 @@ class _TextBlockEditState extends State<TextBlockEdit> {
                   children: [
                     Text("Text Editor",
                         style: GoogleFonts.poppins(
-                            textStyle: TextStyle(fontSize: 25))),
+                            textStyle: const TextStyle(fontSize: 25))),
                     Padding(
                       padding:
                           EdgeInsets.fromLTRB(width * 0.2, 0, width * 0.2, 0),
@@ -59,7 +57,7 @@ class _TextBlockEditState extends State<TextBlockEdit> {
                 margin: EdgeInsets.fromLTRB(width * 0.1, 0, width * 0.1, 0),
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  boxShadow: shadowBlack(),
+                  boxShadow: box_shadow(context),
                   borderRadius: const BorderRadius.all(Radius.circular(5)),
                   color: Colors.white70,
                   border: Border.all(color: Colors.black, width: 1),

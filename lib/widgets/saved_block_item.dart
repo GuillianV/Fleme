@@ -1,6 +1,6 @@
 import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:fleme/models/recognizer.dart';
-import 'package:fleme/utils/shadow_black.dart';
+import 'package:fleme/theme/box_shadow.dart';
 import 'package:fleme/views/image_filter_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -42,7 +42,7 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
               ? const Color.fromARGB(255, 239, 238, 238)
               : Colors.white,
           borderRadius: BorderRadius.circular(5),
-          boxShadow: shadowBlack(),
+          boxShadow: box_shadow(context),
         ),
         child: Column(children: [
           Text(widget.text),
@@ -82,7 +82,7 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
                         height: 50,
                         decoration: BoxDecoration(
                             color: const Color.fromARGB(255, 255, 126, 117),
-                            boxShadow: shadowBlack(),
+                            boxShadow: box_shadow(context),
                             borderRadius: BorderRadius.circular(15)),
                         child: const Icon(Icons.delete),
                       ),
@@ -105,7 +105,7 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
                         height: 50,
                         decoration: BoxDecoration(
                             color: const Color.fromARGB(255, 129, 175, 255),
-                            boxShadow: shadowBlack(),
+                            boxShadow: box_shadow(context),
                             borderRadius: BorderRadius.circular(15)),
                         child: const Icon(Icons.mode_edit, color: Colors.white),
                       ),

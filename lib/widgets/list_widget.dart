@@ -1,21 +1,21 @@
 import 'dart:io';
+
 import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:fleme/models/recognizer.dart';
+import 'package:fleme/theme/box_shadow.dart';
 import 'package:fleme/widgets/blur_title_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import '../utils/shadow_black.dart';
-
-class ImagesList extends StatelessWidget {
-  const ImagesList({
+class ScanList extends StatelessWidget {
+  const ScanList({
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
+    ThemeData theme = Theme.of(context);
 
     return Consumer<Recognizers>(builder: (context, recognizers, child) {
       return recognizers.getRecognizers().isEmpty
@@ -24,18 +24,14 @@ class ImagesList extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                   Image.asset("assets/images/fleme.png"),
-                  Text("${"Fleme".toUpperCase()} Application !",
-                      style: GoogleFonts.poppins(
-                          textStyle: const TextStyle(fontSize: 25))),
+                  Text("Fleme".toUpperCase(), style: theme.textTheme.headline1),
                   Padding(
                     padding:
                         EdgeInsets.fromLTRB(width * 0.2, 0, width * 0.2, 0),
                     child: Text(
-                        "Scannez votre environnement pour détecter du text et vous l'envoyer. Appuyez sur le bouton en bas a droite pour commencer !",
+                        "Scannez votre environnement pour détecter du texte et vous l'envoyer. Appuyez sur le bouton en bas a droite pour commencer !",
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.poppins(
-                            textStyle: const TextStyle(
-                                fontSize: 12, letterSpacing: -0.5))),
+                        style: theme.textTheme.bodyText2),
                   )
                 ])
           : ListView.builder(
@@ -69,9 +65,8 @@ class ImagesList extends StatelessWidget {
                             : Image.asset("assets/images/fleme.png").image,
                         fit: BoxFit.cover,
                       ),
-                      color: const Color.fromARGB(255, 192, 225, 253),
                       borderRadius: BorderRadius.circular(5),
-                      boxShadow: shadowBlack(),
+                      boxShadow: box_shadow(context),
                     ),
                     child: BlurTitle(
                         text:

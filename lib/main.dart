@@ -1,9 +1,6 @@
-import 'dart:io';
-import 'package:camera/camera.dart';
 import 'package:fleme/models/providers/picture_provider.dart';
 import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:fleme/theme/theme.dart';
-import 'package:fleme/views/camera_view.dart';
 import 'package:fleme/views/homepage_view.dart';
 import 'package:fleme/views/image_filter_view.dart';
 import 'package:fleme/views/image_recognized_view.dart';
@@ -37,12 +34,12 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    ThemeMode _themeMode = ThemeMode.dark;
+    ThemeMode themeMode = ThemeMode.dark;
 
     return MaterialApp(
       title: 'Fleme',
       debugShowCheckedModeBanner: false,
-      themeMode: _themeMode,
+      themeMode: themeMode,
       theme: theme(ThemeMode.light),
       darkTheme: theme(ThemeMode.dark),
       routes: {
@@ -64,9 +61,6 @@ class MyApp extends StatelessWidget {
           final value = settings.arguments as int;
           return MaterialPageRoute(
               builder: (_) => ImageRecognized(recognizedId: value));
-        } else if (settings.name == '/camera') {
-          final value = settings.arguments as List<CameraDescription>;
-          return MaterialPageRoute(builder: (_) => CameraPage(cameras: value));
         } else if (settings.name == '/textBlock_edit') {
           Map data = settings.arguments! as Map;
           final recognizedId = data["recognizedId"] as int;

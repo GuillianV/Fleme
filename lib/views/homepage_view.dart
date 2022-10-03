@@ -1,10 +1,8 @@
-import 'dart:async';
 import 'dart:io';
-import 'package:camera/camera.dart';
+
 import 'package:fleme/page/list_page.dart';
 import 'package:fleme/page/scan_page.dart';
 import 'package:fleme/page/settings_page.dart';
-import 'package:fleme/widgets/images_list_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -73,16 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
               label: 'Parametres', icon: Icon(Icons.settings)),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await availableCameras()
-              .then((value) =>
-                  Navigator.pushNamed(context, '/camera', arguments: value))
-              .catchError((onError) => Navigator.pop(context));
-        },
-        tooltip: 'Scan text',
-        child: const Icon(Icons.image),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 

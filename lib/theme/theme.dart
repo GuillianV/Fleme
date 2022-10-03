@@ -10,9 +10,11 @@ ThemeData theme(ThemeMode themeMode) {
 
   String fontFamily = GoogleFonts.poppins().fontFamily ?? '';
 
+
+
   if (ThemeMode.light == themeMode) {
-    primaryColor = Color.fromARGB(255, 54, 143, 139);
-    secondaryColor = Color.fromARGB(255, 34, 34, 34);
+    primaryColor = const Color.fromARGB(255, 54, 143, 139);
+    secondaryColor = const Color.fromARGB(255, 34, 34, 34);
     backgroundColor = const Color.fromARGB(255, 241, 237, 238);
 
     brightness = Brightness.light;
@@ -21,7 +23,7 @@ ThemeData theme(ThemeMode themeMode) {
       secondary: secondaryColor,
     );
   } else {
-    primaryColor = Color.fromARGB(255, 54, 143, 139);
+    primaryColor = const Color.fromARGB(255, 54, 143, 139);
     secondaryColor = const Color.fromARGB(255, 241, 237, 238);
     backgroundColor = const Color.fromARGB(255, 34, 34, 34);
 
@@ -29,6 +31,7 @@ ThemeData theme(ThemeMode themeMode) {
     colorScheme = ColorScheme.dark(
       primary: primaryColor,
       secondary: secondaryColor,
+      
     );
   }
 
@@ -40,6 +43,15 @@ ThemeData theme(ThemeMode themeMode) {
     fontFamily: fontFamily,
     backgroundColor: backgroundColor,
     canvasColor: backgroundColor,
+    
+
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5),
+        ),
+      ),
+    ),
 
     textTheme: TextTheme(
       headline1: const TextStyle(
@@ -63,3 +75,5 @@ ThemeData theme(ThemeMode themeMode) {
     ).apply(bodyColor: secondaryColor, displayColor: primaryColor),
   );
 }
+
+
