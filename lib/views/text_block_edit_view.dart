@@ -6,9 +6,9 @@ import 'package:fleme/models/recognizer.dart';
 import 'package:fleme/models/recognizer_block.dart';
 import 'package:fleme/utils/shadow_black.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:fleme/views/image_filter_view.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class TextBlockEdit extends StatefulWidget {
   const TextBlockEdit(

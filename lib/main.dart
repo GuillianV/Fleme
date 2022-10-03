@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:fleme/models/providers/picture_provider.dart';
 import 'package:fleme/models/providers/recognizer_provider.dart';
+import 'package:fleme/theme/theme.dart';
 import 'package:fleme/views/camera_view.dart';
 import 'package:fleme/views/homepage_view.dart';
 import 'package:fleme/views/image_filter_view.dart';
@@ -36,12 +37,14 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    ThemeMode _themeMode = ThemeMode.dark;
+
     return MaterialApp(
       title: 'Fleme',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      themeMode: _themeMode,
+      theme: theme(ThemeMode.light),
+      darkTheme: theme(ThemeMode.dark),
       routes: {
         '/': (context) => const MyHomePage(title: 'Fleme'),
       },
