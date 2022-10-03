@@ -171,7 +171,7 @@ class _ScanPageState extends State<ScanPage> {
                   child: MorphismButton(
                       icon: Icon(
                         Icons.camera_alt,
-                        color: themeActual.colorScheme.primary,
+                        color: themeActual.colorScheme.secondary,
                         size: 30.0,
                         textDirection: TextDirection.ltr,
                         semanticLabel:

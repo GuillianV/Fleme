@@ -1,19 +1,19 @@
 import 'dart:io';
-import 'dart:ui';
+
 import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:fleme/models/recognizer.dart';
 import 'package:fleme/models/recognizerNetwork.dart';
 import 'package:fleme/models/recognizer_block.dart';
-import 'package:fleme/widgets/image_resume_widget.dart';
-import 'package:fleme/widgets/saved_block_item.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:fleme/widgets/resume_widget.dart';
+import 'package:fleme/widgets/saved_block.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ImageRecognized extends StatefulWidget {
   const ImageRecognized({super.key, required this.recognizedId});
@@ -29,6 +29,8 @@ class _ImageRecognizedState extends State<ImageRecognized> {
 
   @override
   Widget build(BuildContext context) {
+    ThemeData themeActual = Theme.of(context);
+
     String description = '';
     TextEditingController controller = TextEditingController();
     double width = MediaQuery.of(context).size.width;
@@ -52,7 +54,7 @@ class _ImageRecognizedState extends State<ImageRecognized> {
                   shrinkWrap: true,
                   padding: EdgeInsets.zero,
                   scrollDirection: Axis.vertical,
-                  physics: ScrollPhysics(),
+                  physics: const ScrollPhysics(),
                   itemCount: recognizers
                           .getRecognizer(widget.recognizedId)
                           ?.getSavedTextBlock()
@@ -89,8 +91,8 @@ class _ImageRecognizedState extends State<ImageRecognized> {
                 // recognzers.removeRecognizerById(widget.recognizedId);
                 Navigator.pushNamed(context, "/");
               },
-              backgroundColor: Colors.white,
-              child: const Icon(Icons.home, color: Colors.black87),
+              backgroundColor: themeActual.colorScheme.primary,
+              child: Icon(Icons.home, color: themeActual.colorScheme.secondary),
             ),
             FloatingActionButton(
               heroTag: "delete_image_r",
@@ -102,11 +104,12 @@ class _ImageRecognizedState extends State<ImageRecognized> {
                 recognzers.removeRecognizerById(widget.recognizedId,
                     refresh: false);
               },
-              child: const Icon(Icons.close, color: Colors.white70),
               backgroundColor: Colors.red,
+              child: const Icon(Icons.close, color: Colors.black),
             ),
             FloatingActionButton(
                 heroTag: "link",
+                backgroundColor: themeActual.colorScheme.primary,
                 onPressed: () async {
                   bool connected = false;
                   final result = await InternetAddress.lookup("google.com");
@@ -125,7 +128,8 @@ class _ImageRecognizedState extends State<ImageRecognized> {
                         toastLength: Toast.LENGTH_LONG,
                         gravity: ToastGravity.CENTER,
                         timeInSecForIosWeb: 1,
-                        backgroundColor: Color.fromARGB(255, 101, 101, 101),
+                        backgroundColor:
+                            const Color.fromARGB(255, 101, 101, 101),
                         textColor: Colors.white,
                         fontSize: 16.0);
                     return;
@@ -136,12 +140,12 @@ class _ImageRecognizedState extends State<ImageRecognized> {
                       recognzers.getRecognizer(widget.recognizedId);
                   if (recognizer == null) Navigator.pushNamed(context, "/");
 
-                  String _text = "";
-                  recognizer!.getSavedTextBlock()?.forEach((element) {
-                    _text += element.getTextEdited() + "\n";
+                  String text = "";
+                  recognizer!.getSavedTextBlock().forEach((element) {
+                    text += "${element.getTextEdited()}\n";
                   });
                   RecognizerNetwork recognizerNetwork =
-                      await RecognizerNetwork.post(_text);
+                      await RecognizerNetwork.post(text);
 
                   showAnimatedDialog(
                     context: context,
@@ -180,22 +184,27 @@ class _ImageRecognizedState extends State<ImageRecognized> {
                     },
                   );
                 },
-                child: const Icon(Icons.link)),
+                child: Icon(
+                  Icons.link,
+                  color: themeActual.colorScheme.secondary,
+                )),
             FloatingActionButton(
                 heroTag: "share",
+                backgroundColor: themeActual.colorScheme.primary,
                 onPressed: () async {
                   Recognizers recognzers = context.read<Recognizers>();
                   Recognizer? recognizer =
                       recognzers.getRecognizer(widget.recognizedId);
                   if (recognizer == null) Navigator.pushNamed(context, "/");
 
-                  String _text = "";
-                  recognizer!.getSavedTextBlock()?.forEach((element) {
-                    _text += element.getTextEdited() + "\n";
+                  String text = "";
+                  recognizer!.getSavedTextBlock().forEach((element) {
+                    text += "${element.getTextEdited()}\n";
                   });
-                  await Share.share(_text);
+                  await Share.share(text);
                 },
-                child: const Icon(Icons.share)),
+                child: Icon(Icons.share,
+                    color: themeActual.colorScheme.secondary)),
           ]), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }

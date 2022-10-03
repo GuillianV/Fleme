@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:fleme/models/recognizer.dart';
 import 'package:fleme/models/recognizer_block.dart';
@@ -30,6 +31,8 @@ double aspectRationHeight = 1;
 class _ImageFilterState extends State<ImageFilter> {
   @override
   Widget build(BuildContext context) {
+    ThemeData themeActual = Theme.of(context);
+
     final bool isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
 
@@ -48,8 +51,8 @@ class _ImageFilterState extends State<ImageFilter> {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
 
-    containerWidth = width * 0.9;
-    containerHeight = height * 0.9;
+    containerWidth = width * 0.95;
+    containerHeight = height * 0.95;
 
     recognzers = context.read<Recognizers>();
 
@@ -77,7 +80,7 @@ class _ImageFilterState extends State<ImageFilter> {
             },
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
+                borderRadius: const BorderRadius.all(Radius.circular(10)),
                 image: DecorationImage(
                   fit: BoxFit.cover,
                   image: Image.file(
@@ -106,19 +109,23 @@ class _ImageFilterState extends State<ImageFilter> {
                   recognzers.removeRecognizerById(widget.recognizedId);
                   Navigator.pop(context);
                 },
-                child: const Icon(Icons.close),
                 backgroundColor: Colors.red,
+                child: const Icon(Icons.close),
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(32.0),
               child: FloatingActionButton(
                   heroTag: "save",
+                  backgroundColor: themeActual.colorScheme.primary,
                   onPressed: () {
                     Navigator.pushNamed(context, '/image_recognized',
                         arguments: widget.recognizedId);
                   },
-                  child: const Icon(Icons.save)),
+                  child: Icon(
+                    Icons.save,
+                    color: themeActual.colorScheme.secondary,
+                  )),
             ),
           ]),
     );
@@ -128,7 +135,7 @@ class _ImageFilterState extends State<ImageFilter> {
   List<Widget> showPositioned(BuildContext context, int recognizedId) {
     List<Widget> positioned = List.empty(growable: true);
 
-    recognizer!.getBlockRecognized()?.forEach((blockRecognized) {
+    recognizer!.getBlockRecognized().forEach((blockRecognized) {
       Rect rect = blockRecognized.getBoundingBox();
 
       positioned.add(Positioned(

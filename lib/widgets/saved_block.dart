@@ -1,7 +1,7 @@
 import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:fleme/models/recognizer.dart';
 import 'package:fleme/theme/box_shadow.dart';
-import 'package:fleme/views/image_filter_view.dart';
+import 'package:fleme/views/filter_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -26,6 +26,8 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
 
   @override
   Widget build(BuildContext context) {
+    ThemeData themeActual = Theme.of(context);
+
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -39,8 +41,8 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
         margin: const EdgeInsets.all(5.0),
         decoration: BoxDecoration(
           color: !isTaped
-              ? const Color.fromARGB(255, 239, 238, 238)
-              : Colors.white,
+              ? themeActual.colorScheme.background
+              : themeActual.colorScheme.background.withOpacity(0.8),
           borderRadius: BorderRadius.circular(5),
           boxShadow: box_shadow(context),
         ),

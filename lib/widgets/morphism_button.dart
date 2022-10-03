@@ -41,11 +41,11 @@ class _MorphismButtonState extends State<MorphismButton> {
         height: widget.height ?? 50,
         decoration: !_isPressed
             ? BoxDecoration(
-                color: themeActual.colorScheme.secondary,
+                color: themeActual.colorScheme.primary,
                 borderRadius: BorderRadius.circular(5),
                 boxShadow: box_shadow(context))
             : BoxDecoration(
-                color: themeActual.colorScheme.secondary.withOpacity(0.8),
+                color: themeActual.colorScheme.primary.withOpacity(0.8),
                 borderRadius: BorderRadius.circular(5),
                 boxShadow: box_shadow(context)),
         child: Center(

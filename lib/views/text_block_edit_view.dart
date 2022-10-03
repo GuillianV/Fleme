@@ -3,7 +3,7 @@ import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:fleme/models/recognizer.dart';
 import 'package:fleme/models/recognizer_block.dart';
 import 'package:fleme/theme/box_shadow.dart';
-import 'package:fleme/views/image_filter_view.dart';
+import 'package:fleme/views/filter_view.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';

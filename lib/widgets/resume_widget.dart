@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:fleme/models/recognizer.dart';
 import 'package:fleme/widgets/blur_title_widget.dart';
@@ -30,14 +31,14 @@ class ImageResume extends StatelessWidget {
           image: DecorationImage(
             fit: BoxFit.cover,
             image: recognizer != null
-                ? Image.file(File(recognizer!.getFilePath())).image
+                ? Image.file(File(recognizer.getFilePath())).image
                 : Image.asset("assets/images/fleme.png").image,
           ),
         ),
         // ignore: unnecessary_null_comparison
         child: recognizers.exists(recognizedId) != null
             ? BlurTitle(
-                text: "${recognizer!.getBlockRecognized().length} blocks")
+                text: "${recognizer!.getBlockRecognized().length} Blocks")
             : null,
       );
     });
