@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:fleme/models/recognizer.dart';
 import 'package:fleme/theme/box_shadow.dart';
+import 'package:fleme/views/homepage_view.dart';
 import 'package:fleme/widgets/blur_title_widget.dart';
+import 'package:fleme/widgets/morphism_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -23,8 +25,11 @@ class ScanList extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                  Image.asset("assets/images/fleme.png"),
                   Text("Fleme".toUpperCase(), style: theme.textTheme.headline1),
+                  Image.asset(
+                    "assets/images/fleme.png",
+                    width: width * 0.7,
+                  ),
                   Padding(
                     padding:
                         EdgeInsets.fromLTRB(width * 0.2, 0, width * 0.2, 0),
@@ -32,6 +37,17 @@ class ScanList extends StatelessWidget {
                         "Scannez votre environnement pour détecter du texte et vous l'envoyer. Appuyez sur le bouton en bas a droite pour commencer !",
                         textAlign: TextAlign.center,
                         style: theme.textTheme.bodyText2),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: MorphismButton(
+                      icon: Icon(Icons.camera_alt,
+                          color: theme.colorScheme.secondary),
+                      onTaped: () {
+                        MyHomePage.of(context).onItemTapped(1);
+                      },
+                      textValue: '',
+                    ),
                   )
                 ])
           : ListView.builder(
@@ -66,6 +82,10 @@ class ScanList extends StatelessWidget {
                         fit: BoxFit.cover,
                       ),
                       borderRadius: BorderRadius.circular(5),
+                      border: Border.all(
+                        color: theme.primaryColor,
+                        width: 1,
+                      ),
                       boxShadow: box_shadow(context),
                     ),
                     child: BlurTitle(

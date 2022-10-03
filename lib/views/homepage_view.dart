@@ -12,6 +12,10 @@ class MyHomePage extends StatefulWidget {
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
+
+  static _MyHomePageState of(BuildContext context) {
+    return context.findAncestorStateOfType<_MyHomePageState>()!;
+  }
 }
 
 class _MyHomePageState extends State<MyHomePage> {
@@ -32,17 +36,17 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    ThemeData themeActual = Theme.of(context);
+    ThemeData theme = Theme.of(context);
 
-    Brightness brightnessIcons = themeActual.brightness == Brightness.dark
+    Brightness brightnessIcons = theme.brightness == Brightness.dark
         ? Brightness.light
         : Brightness.dark;
 
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        statusBarColor: themeActual.backgroundColor,
+        statusBarColor: theme.backgroundColor,
         statusBarBrightness: brightnessIcons,
         statusBarIconBrightness: brightnessIcons,
-        systemNavigationBarColor: themeActual.backgroundColor,
+        systemNavigationBarColor: theme.backgroundColor,
         systemNavigationBarIconBrightness: brightnessIcons));
 
     if (_pageController == null) exit(1);
@@ -61,7 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
         currentIndex: _selectedIndex,
         selectedItemColor: Theme.of(context).colorScheme.primary,
         unselectedItemColor: Theme.of(context).colorScheme.secondary,
-        onTap: _onItemTapped,
+        onTap: onItemTapped,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
               label: 'Mon Texte', icon: Icon(Icons.text_fields)),
@@ -75,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _onItemTapped(int index) {
+  void onItemTapped(int index) {
     setState(() {
       _pageController.animateToPage(index,
           duration: const Duration(milliseconds: 500), curve: Curves.easeOut);

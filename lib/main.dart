@@ -1,10 +1,10 @@
 import 'package:fleme/models/providers/picture_provider.dart';
 import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:fleme/theme/theme.dart';
-import 'package:fleme/views/homepage_view.dart';
+import 'package:fleme/views/block_edit_view.dart';
 import 'package:fleme/views/filter_view.dart';
+import 'package:fleme/views/homepage_view.dart';
 import 'package:fleme/views/recognized_view.dart';
-import 'package:fleme/views/text_block_edit_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -28,18 +28,35 @@ Future main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  @override
+  State<MyApp> createState() => _MyAppState();
+
+  static _MyAppState of(BuildContext context) =>
+      context.findAncestorStateOfType<_MyAppState>()!;
+}
+
+class _MyAppState extends State<MyApp> {
+  ThemeMode _themeMode = ThemeMode.dark;
+
+  void changeTheme(ThemeMode themeMode) {
+    setState(() {
+      _themeMode = themeMode;
+    });
+  }
+
+  ThemeMode getTheme() {
+    return _themeMode;
+  }
+
   @override
   Widget build(BuildContext context) {
-    ThemeMode themeMode = ThemeMode.dark;
-
     return MaterialApp(
       title: 'Fleme',
       debugShowCheckedModeBanner: false,
-      themeMode: themeMode,
+      themeMode: _themeMode,
       theme: theme(ThemeMode.light),
       darkTheme: theme(ThemeMode.dark),
       routes: {

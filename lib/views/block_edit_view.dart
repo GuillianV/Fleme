@@ -21,6 +21,8 @@ class TextBlockEdit extends StatefulWidget {
 class _TextBlockEditState extends State<TextBlockEdit> {
   @override
   Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+
     Recognizers recognizers = context.read<Recognizers>();
     Recognizer? recognizer = recognizers.getRecognizer(widget.recognizedId);
     Recognizerblock? textBlock =
@@ -54,13 +56,15 @@ class _TextBlockEditState extends State<TextBlockEdit> {
                     )
                   ]),
               Container(
-                margin: EdgeInsets.fromLTRB(width * 0.1, 0, width * 0.1, 0),
+                margin: EdgeInsets.fromLTRB(
+                    width * 0.1, height * 0.05, width * 0.1, 0),
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
                   boxShadow: box_shadow(context),
                   borderRadius: const BorderRadius.all(Radius.circular(5)),
-                  color: Colors.white70,
-                  border: Border.all(color: Colors.black, width: 1),
+                  color: theme.backgroundColor,
+                  border:
+                      Border.all(color: theme.colorScheme.primary, width: 1),
                 ),
                 child: TextField(
                   controller: txtController,
@@ -80,11 +84,15 @@ class _TextBlockEditState extends State<TextBlockEdit> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: theme.colorScheme.primary,
         onPressed: () async {
           await availableCameras().then((value) => Navigator.pop(context));
         },
         tooltip: 'Back',
-        child: const Icon(Icons.arrow_back),
+        child: Icon(
+          Icons.arrow_back,
+          color: theme.colorScheme.secondary,
+        ),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }

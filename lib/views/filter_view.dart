@@ -31,7 +31,7 @@ double aspectRationHeight = 1;
 class _ImageFilterState extends State<ImageFilter> {
   @override
   Widget build(BuildContext context) {
-    ThemeData themeActual = Theme.of(context);
+    ThemeData theme = Theme.of(context);
 
     final bool isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
@@ -117,14 +117,14 @@ class _ImageFilterState extends State<ImageFilter> {
               padding: const EdgeInsets.all(32.0),
               child: FloatingActionButton(
                   heroTag: "save",
-                  backgroundColor: themeActual.colorScheme.primary,
+                  backgroundColor: theme.colorScheme.primary,
                   onPressed: () {
                     Navigator.pushNamed(context, '/image_recognized',
                         arguments: widget.recognizedId);
                   },
                   child: Icon(
                     Icons.save,
-                    color: themeActual.colorScheme.secondary,
+                    color: theme.colorScheme.secondary,
                   )),
             ),
           ]),

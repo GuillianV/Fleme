@@ -26,7 +26,7 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
 
   @override
   Widget build(BuildContext context) {
-    ThemeData themeActual = Theme.of(context);
+    ThemeData theme = Theme.of(context);
 
     return GestureDetector(
       onTap: () {
@@ -41,10 +41,14 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
         margin: const EdgeInsets.all(5.0),
         decoration: BoxDecoration(
           color: !isTaped
-              ? themeActual.colorScheme.background
-              : themeActual.colorScheme.background.withOpacity(0.8),
+              ? theme.backgroundColor
+              : theme.backgroundColor.withOpacity(0.8),
           borderRadius: BorderRadius.circular(5),
           boxShadow: box_shadow(context),
+          border: Border.all(
+            color: theme.primaryColor,
+            width: 1,
+          ),
         ),
         child: Column(children: [
           Text(widget.text),
@@ -83,10 +87,10 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
                         width: 50,
                         height: 50,
                         decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 255, 126, 117),
+                            color: theme.errorColor,
                             boxShadow: box_shadow(context),
                             borderRadius: BorderRadius.circular(15)),
-                        child: const Icon(Icons.delete),
+                        child: Icon(Icons.delete, color: theme.backgroundColor),
                       ),
                     ),
                   ),
@@ -106,10 +110,13 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
                         width: 50,
                         height: 50,
                         decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 129, 175, 255),
+                            color: theme.colorScheme.primary,
                             boxShadow: box_shadow(context),
                             borderRadius: BorderRadius.circular(15)),
-                        child: const Icon(Icons.mode_edit, color: Colors.white),
+                        child: Icon(
+                          Icons.mode_edit,
+                          color: theme.colorScheme.secondary,
+                        ),
                       ),
                     ),
                   )

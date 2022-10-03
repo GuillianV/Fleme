@@ -10,8 +10,6 @@ ThemeData theme(ThemeMode themeMode) {
 
   String fontFamily = GoogleFonts.poppins().fontFamily ?? '';
 
-
-
   if (ThemeMode.light == themeMode) {
     primaryColor = const Color.fromARGB(255, 54, 143, 139);
     secondaryColor = const Color.fromARGB(255, 34, 34, 34);
@@ -31,7 +29,6 @@ ThemeData theme(ThemeMode themeMode) {
     colorScheme = ColorScheme.dark(
       primary: primaryColor,
       secondary: secondaryColor,
-      
     );
   }
 
@@ -43,7 +40,6 @@ ThemeData theme(ThemeMode themeMode) {
     fontFamily: fontFamily,
     backgroundColor: backgroundColor,
     canvasColor: backgroundColor,
-    
 
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
@@ -53,6 +49,7 @@ ThemeData theme(ThemeMode themeMode) {
       ),
     ),
 
+    errorColor: const Color.fromARGB(255, 255, 90, 81),
     textTheme: TextTheme(
       headline1: const TextStyle(
         fontSize: 72.0,
@@ -75,5 +72,3 @@ ThemeData theme(ThemeMode themeMode) {
     ).apply(bodyColor: secondaryColor, displayColor: primaryColor),
   );
 }
-
-

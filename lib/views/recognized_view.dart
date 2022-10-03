@@ -29,7 +29,7 @@ class _ImageRecognizedState extends State<ImageRecognized> {
 
   @override
   Widget build(BuildContext context) {
-    ThemeData themeActual = Theme.of(context);
+    ThemeData theme = Theme.of(context);
 
     String description = '';
     TextEditingController controller = TextEditingController();
@@ -91,8 +91,8 @@ class _ImageRecognizedState extends State<ImageRecognized> {
                 // recognzers.removeRecognizerById(widget.recognizedId);
                 Navigator.pushNamed(context, "/");
               },
-              backgroundColor: themeActual.colorScheme.primary,
-              child: Icon(Icons.home, color: themeActual.colorScheme.secondary),
+              backgroundColor: theme.colorScheme.primary,
+              child: Icon(Icons.home, color: theme.colorScheme.secondary),
             ),
             FloatingActionButton(
               heroTag: "delete_image_r",
@@ -109,7 +109,7 @@ class _ImageRecognizedState extends State<ImageRecognized> {
             ),
             FloatingActionButton(
                 heroTag: "link",
-                backgroundColor: themeActual.colorScheme.primary,
+                backgroundColor: theme.colorScheme.primary,
                 onPressed: () async {
                   bool connected = false;
                   final result = await InternetAddress.lookup("google.com");
@@ -186,11 +186,11 @@ class _ImageRecognizedState extends State<ImageRecognized> {
                 },
                 child: Icon(
                   Icons.link,
-                  color: themeActual.colorScheme.secondary,
+                  color: theme.colorScheme.secondary,
                 )),
             FloatingActionButton(
                 heroTag: "share",
-                backgroundColor: themeActual.colorScheme.primary,
+                backgroundColor: theme.colorScheme.primary,
                 onPressed: () async {
                   Recognizers recognzers = context.read<Recognizers>();
                   Recognizer? recognizer =
@@ -203,8 +203,7 @@ class _ImageRecognizedState extends State<ImageRecognized> {
                   });
                   await Share.share(text);
                 },
-                child: Icon(Icons.share,
-                    color: themeActual.colorScheme.secondary)),
+                child: Icon(Icons.share, color: theme.colorScheme.secondary)),
           ]), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }

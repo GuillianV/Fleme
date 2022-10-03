@@ -85,7 +85,7 @@ class _ScanPageState extends State<ScanPage> {
     final isLandscape = MediaQuery.of(context).orientation ==
         Orientation.landscape; // check if the orientation is landscape
 
-    ThemeData themeActual = Theme.of(context);
+    ThemeData theme = Theme.of(context);
 
     return FutureBuilder<bool>(
       future: cameraInitialized,
@@ -151,8 +151,7 @@ class _ScanPageState extends State<ScanPage> {
                         decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                                color: themeActual.colorScheme.primary,
-                                width: 1.5)),
+                                color: theme.colorScheme.primary, width: 1.5)),
                       )),
                 if (isPicked)
                   Container(
@@ -171,7 +170,7 @@ class _ScanPageState extends State<ScanPage> {
                   child: MorphismButton(
                       icon: Icon(
                         Icons.camera_alt,
-                        color: themeActual.colorScheme.secondary,
+                        color: theme.colorScheme.secondary,
                         size: 30.0,
                         textDirection: TextDirection.ltr,
                         semanticLabel:

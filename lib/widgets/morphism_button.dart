@@ -27,7 +27,7 @@ class _MorphismButtonState extends State<MorphismButton> {
 
   @override
   Widget build(BuildContext context) {
-    ThemeData themeActual = Theme.of(context);
+    ThemeData theme = Theme.of(context);
 
     return GestureDetector(
       onTap: () => {
@@ -41,11 +41,11 @@ class _MorphismButtonState extends State<MorphismButton> {
         height: widget.height ?? 50,
         decoration: !_isPressed
             ? BoxDecoration(
-                color: themeActual.colorScheme.primary,
+                color: theme.colorScheme.primary,
                 borderRadius: BorderRadius.circular(5),
                 boxShadow: box_shadow(context))
             : BoxDecoration(
-                color: themeActual.colorScheme.primary.withOpacity(0.8),
+                color: theme.colorScheme.primary.withOpacity(0.8),
                 borderRadius: BorderRadius.circular(5),
                 boxShadow: box_shadow(context)),
         child: Center(
@@ -55,7 +55,7 @@ class _MorphismButtonState extends State<MorphismButton> {
                     padding: const EdgeInsets.all(16.0),
                     child: Text(widget.textValue,
                         textAlign: TextAlign.center,
-                        style: themeActual.textTheme.headline5),
+                        style: theme.textTheme.headline5),
                   )),
       ),
     );
