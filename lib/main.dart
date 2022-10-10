@@ -3,7 +3,7 @@ import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:fleme/theme/theme.dart';
 import 'package:fleme/views/block_edit_view.dart';
 import 'package:fleme/views/filter_view.dart';
-import 'package:fleme/views/homepage_view.dart';
+import 'package:fleme/views/pdf_edit.dart';
 import 'package:fleme/views/recognized_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -60,7 +60,7 @@ class _MyAppState extends State<MyApp> {
       theme: theme(ThemeMode.light),
       darkTheme: theme(ThemeMode.dark),
       routes: {
-        '/': (context) => const MyHomePage(title: 'Fleme'),
+        '/': (context) => /*const MyHomePage(title: 'Fleme')*/ const PdfView(),
       },
       onGenerateRoute: (settings) {
         SystemChrome.setPreferredOrientations([
