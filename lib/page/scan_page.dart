@@ -33,6 +33,7 @@ class _ScanPageState extends State<ScanPage> {
   double maxZoomLevel = 1.0;
   double minZoomLevel = 1.0;
 
+
   @override
   void initState() {
     super.initState();

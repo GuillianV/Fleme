@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-
-
 class MyWidget extends StatefulWidget {
   const MyWidget({
     Key? key,
@@ -14,7 +12,7 @@ class MyWidget extends StatefulWidget {
 class _MyWidgetState extends State<MyWidget> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: Center(
         child: Text('Map Page'),
       ),

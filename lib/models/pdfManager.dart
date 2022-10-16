@@ -26,21 +26,24 @@ class PDFManager {
         return null;
       }
     }
-    if (!manageExternalStorage.isGranted) {
-      await Permission.manageExternalStorage.request();
-      if (!manageExternalStorage.isGranted) {
-        return null;
-      }
-    }
+    // if (!manageExternalStorage.isGranted) {
+    //   await Permission.manageExternalStorage.request();
+    //   if (!manageExternalStorage.isGranted) {
+    //     return null;
+    //   }
+    // }
 
-    Directory dir = Directory(
-        '${(Platform.isAndroid ? "storage/emulated/0" : await getApplicationSupportDirectory())}');
+    Directory dir = Directory((Platform.isAndroid
+                ? await getExternalStorageDirectory()
+                : await getApplicationSupportDirectory())
+            ?.path ??
+        '');
 
     var pdf = pw.Document();
 
-    if (!await dir.exists()) {
-      await dir.create(recursive: true);
-    }
+    // if (!await dir.exists()) {
+    //   await dir.create(recursive: true);
+    // }
 
     PDFManager manager = PDFManager(dir, pdf);
     if (await manager._load(documentName)) {

@@ -18,7 +18,9 @@ class Recognizer {
   Future<void> setTextBlock() async {
     InputImage inputImage = InputImage.fromFilePath(getFilePath());
     String myDecryptedText = '';
-    final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+    final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin, );
+  
+ 
 
     File image =
         new File(getFilePath()); // Or any other way to get a File instance.
