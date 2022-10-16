@@ -18,7 +18,7 @@ class _PdfViewState extends State<PdfView> {
   int? currentPage = 0;
   bool isReady = false;
   String errorMessage = '';
-  final bool _isLoading = true;
+  bool _isLoading = true;
 
   late PDFManager pdfManager;
 
@@ -29,13 +29,13 @@ class _PdfViewState extends State<PdfView> {
   }
 
   loadDocument() async {
-    pdfManager = await PDFManager.init('test_pdf');
+    pdfManager = await PDFManager.init('test7_pdf');
 
     if (!pdfManager.isCreated) {
       await pdfManager.create();
     }
 
-    // setState(() => _isLoading = !pdfManager.isLoad);
+    setState(() => _isLoading = !pdfManager.isCreated);
   }
 
   @override
@@ -54,29 +54,33 @@ class _PdfViewState extends State<PdfView> {
       body: Center(
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
-            : PDFView(
-                filePath: pdfManager.pdfFile.path,
-                onRender: (pages) {
-                  setState(() {
-                    pages = pages;
-                    isReady = true;
-                  });
-                },
-                onError: (error) {
-                  setState(() {
-                    errorMessage = error.toString();
-                  });
-                  print(error.toString());
-                },
-                onPageError: (page, error) {
-                  setState(() {
-                    errorMessage = '$page: ${error.toString()}';
-                  });
-                  print('$page: ${error.toString()}');
-                },
-                onViewCreated: (PDFViewController pdfViewController) {
-                  _controller.complete(pdfViewController);
-                },
+            : Listener(
+                onPointerDown: (event) {},
+                onPointerUp: (event) {},
+                child: PDFView(
+                  filePath: pdfManager.file.path,
+                  onRender: (pages) {
+                    setState(() {
+                      pages = pages;
+                      isReady = true;
+                    });
+                  },
+                  onError: (error) {
+                    setState(() {
+                      errorMessage = error.toString();
+                    });
+                    print(error.toString());
+                  },
+                  onPageError: (page, error) {
+                    setState(() {
+                      errorMessage = '$page: ${error.toString()}';
+                    });
+                    print('$page: ${error.toString()}');
+                  },
+                  onViewCreated: (PDFViewController pdfViewController) {
+                    _controller.complete(pdfViewController);
+                  },
+                ),
               ),
       ),
     );
