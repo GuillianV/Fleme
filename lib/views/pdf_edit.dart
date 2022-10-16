@@ -18,9 +18,9 @@ class _PdfViewState extends State<PdfView> {
   int? currentPage = 0;
   bool isReady = false;
   String errorMessage = '';
-  bool _isLoading = true;
+  final bool _isLoading = true;
 
-  late PDFManager? pdfManager;
+  late PDFManager pdfManager;
 
   @override
   void initState() {
@@ -29,10 +29,13 @@ class _PdfViewState extends State<PdfView> {
   }
 
   loadDocument() async {
-    pdfManager = await PDFManager.create('test_pdf');
-    if (pdfManager == null) return;
+    pdfManager = await PDFManager.init('test_pdf');
 
-    setState(() => _isLoading = !pdfManager!.isLoad);
+    if (!pdfManager.isCreated) {
+      await pdfManager.create();
+    }
+
+    // setState(() => _isLoading = !pdfManager.isLoad);
   }
 
   @override
@@ -52,7 +55,7 @@ class _PdfViewState extends State<PdfView> {
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : PDFView(
-                filePath: pdfManager!.file.path,
+                filePath: pdfManager.pdfFile.path,
                 onRender: (pages) {
                   setState(() {
                     pages = pages;
