@@ -3,6 +3,7 @@ import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:fleme/theme/theme.dart';
 import 'package:fleme/views/block_edit_view.dart';
 import 'package:fleme/views/filter_view.dart';
+import 'package:fleme/views/homepage_view.dart';
 import 'package:fleme/views/pdf_edit.dart';
 import 'package:fleme/views/recognized_view.dart';
 import 'package:flutter/material.dart';
@@ -85,6 +86,11 @@ class _MyAppState extends State<MyApp> {
           return MaterialPageRoute(
               builder: (_) => TextBlockEdit(
                   recognizedId: recognizedId, textBlockId: textBlockId));
+        } else if (settings.name == '/home') {
+          return MaterialPageRoute(
+              builder: (_) => const MyHomePage(
+                    title: "Fleme",
+                  ));
         }
 
         return null;

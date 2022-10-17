@@ -1,8 +1,11 @@
 import 'dart:async';
 
 import 'package:fleme/models/pdfManager.dart';
+import 'package:fleme/widgets/precise_listner_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 
 class PdfView extends StatefulWidget {
   const PdfView({super.key});
@@ -25,7 +28,6 @@ class _PdfViewState extends State<PdfView> {
   @override
   void initState() {
     super.initState();
-    loadDocument();
   }
 
   loadDocument() async {
@@ -43,8 +45,19 @@ class _PdfViewState extends State<PdfView> {
     return Scaffold(
       drawer: Drawer(
         child: Column(
-          children: const <Widget>[
-            SizedBox(height: 36),
+          children: <Widget>[
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: Text('Fleme'),
+            ),
+            ListTile(
+              title: const Text('Scan'),
+              onTap: () {
+                Navigator.pushNamed(context, '/home');
+              },
+            )
           ],
         ),
       ),
@@ -54,9 +67,21 @@ class _PdfViewState extends State<PdfView> {
       body: Center(
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
-            : Listener(
-                onPointerDown: (event) {},
-                onPointerUp: (event) {},
+            : PreciseListener(
+                onSimpleTaped: (pointerDownEvent, pointerUpEvent) {
+                  setState(() {
+                    pdfManager.addPage(pw.Page(
+                        pageFormat: PdfPageFormat.a4,
+                        margin: const pw.EdgeInsets.all(16),
+                        build: (pw.Context context) {
+                          return pw.Center(
+                            child: pw.Text('Helloqs dsss'),
+                          );
+                        }));
+
+                    loadDocument();
+                  });
+                },
                 child: PDFView(
                   filePath: pdfManager.file.path,
                   onRender: (pages) {
