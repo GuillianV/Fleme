@@ -4,8 +4,6 @@ import 'package:fleme/models/pdfManager.dart';
 import 'package:fleme/widgets/precise_listner_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
 
 class PdfView extends StatefulWidget {
   const PdfView({super.key});
@@ -28,6 +26,7 @@ class _PdfViewState extends State<PdfView> {
   @override
   void initState() {
     super.initState();
+    loadDocument();
   }
 
   loadDocument() async {
@@ -61,52 +60,76 @@ class _PdfViewState extends State<PdfView> {
           ],
         ),
       ),
-      appBar: AppBar(
-        title: const Text('FlutterPluginPDFViewer'),
-      ),
       body: Center(
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
-            : PreciseListener(
-                onSimpleTaped: (pointerDownEvent, pointerUpEvent) {
-                  setState(() {
-                    pdfManager.addPage(pw.Page(
-                        pageFormat: PdfPageFormat.a4,
-                        margin: const pw.EdgeInsets.all(16),
-                        build: (pw.Context context) {
-                          return pw.Center(
-                            child: pw.Text('Helloqs dsss'),
-                          );
-                        }));
+            : const Reader(),
+      ),
+    );
+  }
+}
 
-                    loadDocument();
-                  });
-                },
-                child: PDFView(
-                  filePath: pdfManager.file.path,
-                  onRender: (pages) {
-                    setState(() {
-                      pages = pages;
-                      isReady = true;
-                    });
-                  },
-                  onError: (error) {
-                    setState(() {
-                      errorMessage = error.toString();
-                    });
-                    print(error.toString());
-                  },
-                  onPageError: (page, error) {
-                    setState(() {
-                      errorMessage = '$page: ${error.toString()}';
-                    });
-                    print('$page: ${error.toString()}');
-                  },
-                  onViewCreated: (PDFViewController pdfViewController) {
-                    _controller.complete(pdfViewController);
-                  },
-                ),
-              ),
+class Reader extends StatefulWidget {
+  const Reader({super.key});
+
+  @override
+  State<Reader> createState() => _ReaderState();
+}
+
+class _ReaderState extends State<Reader> {
+  List<Positioned> positions = [];
+
+  @override
+  Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+
+    return InteractiveViewer(
+      panEnabled: true,
+      minScale: 0.5,
+      maxScale: 4,
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        child: Container(
+            decoration: BoxDecoration(
+              color: theme.colorScheme.secondary,
+            ),
+            child: SizedBox(
+              child: Center(
+                  child: SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.9,
+                      height: MediaQuery.of(context).size.width * 0.9 * 1.414,
+                      child: PreciseListener(
+                        onSimpleTaped: (pointerDownEvent, pointerUpEvent) {
+                          setState(() {
+                            positions.add(Positioned(
+                              left: pointerDownEvent.localPosition.dx,
+                              top: pointerDownEvent.localPosition.dy,
+                              child: Text(
+                                'Clicked',
+                                style: theme.textTheme.bodyText2,
+                              ),
+                            ));
+                          });
+                        },
+                        child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.25),
+                                    spreadRadius: 0,
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(5))),
+                            child: Stack(
+                              children: positions,
+                            )),
+                      ))),
+            )),
       ),
     );
   }
@@ -114,45 +137,48 @@ class _PdfViewState extends State<PdfView> {
 
 
 
-// PDFViewer(
-//                   document: snapshot.data!,
-//                   zoomSteps: 1,
-                  //uncomment below line to preload all pages
-                  // lazyLoad: false,
-                  // uncomment below line to scroll vertically
-                  // scrollDirection: Axis.vertical,
+// Container(
+//                       child: SizedBox(
+//                         width: MediaQuery.of(context).size.width * 0.9,
+//                         height: MediaQuery.of(context).size.width * 0.9 * 1.141,
+//                         child: const Text('test'),
+//                       ),
+//                     ),
 
-                  //uncomment below code to replace bottom navigation with your own
-                  /* navigationBuilder:
-                          (context, page, totalPages, jumpToPage, animateToPage) {
-                        return ButtonBar(
-                          alignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            IconButton(
-                              icon: Icon(Icons.first_page),
-                              onPressed: () {
-                                jumpToPage()(page: 0);
-                              },
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.arrow_back),
-                              onPressed: () {
-                                animateToPage(page: page - 2);
-                              },
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.arrow_forward),
-                              onPressed: () {
-                                animateToPage(page: page);
-                              },
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.last_page),
-                              onPressed: () {
-                                jumpToPage(page: totalPages - 1);
-                              },
-                            ),
-                          ],
-                        );
-                      }, */
-          //      );
+// setState(() {
+//                     pdfManager.addPage(pw.Page(
+//                         pageFormat: PdfPageFormat.a4,
+//                         margin: const pw.EdgeInsets.all(16),
+//                         build: (pw.Context context) {
+//                           return pw.Center(
+//                             child: pw.Text('Helloqs dsss'),
+//                           );
+//                         }));
+
+//                     loadDocument();
+//                   });
+
+// PDFView(
+//                   filePath: pdfManager.file.path,
+//                   onRender: (pages) {
+//                     setState(() {
+//                       pages = pages;
+//                       isReady = true;
+//                     });
+//                   },
+//                   onError: (error) {
+//                     setState(() {
+//                       errorMessage = error.toString();
+//                     });
+//                     print(error.toString());
+//                   },
+//                   onPageError: (page, error) {
+//                     setState(() {
+//                       errorMessage = '$page: ${error.toString()}';
+//                     });
+//                     print('$page: ${error.toString()}');
+//                   },
+//                   onViewCreated: (PDFViewController pdfViewController) {
+//                     _controller.complete(pdfViewController);
+//                   },
+//                 ),
