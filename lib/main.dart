@@ -4,7 +4,6 @@ import 'package:fleme/theme/theme.dart';
 import 'package:fleme/views/block_edit_view.dart';
 import 'package:fleme/views/filter_view.dart';
 import 'package:fleme/views/homepage_view.dart';
-import 'package:fleme/views/pdf_edit.dart';
 import 'package:fleme/views/recognized_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -61,7 +60,8 @@ class _MyAppState extends State<MyApp> {
       theme: theme(ThemeMode.light),
       darkTheme: theme(ThemeMode.dark),
       routes: {
-        '/': (context) => /*const MyHomePage(title: 'Fleme')*/ const PdfView(),
+        '/': (context) => /*const MyHomePage(title: 'Fleme')*/ const MyHomePage(
+            title: "Fleme"),
       },
       onGenerateRoute: (settings) {
         SystemChrome.setPreferredOrientations([
