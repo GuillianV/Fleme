@@ -26,7 +26,7 @@ class ImageRecognized extends StatefulWidget {
 
 class _ImageRecognizedState extends State<ImageRecognized> {
   bool isTextBlocks = true;
-
+  bool isDragging = false;
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);

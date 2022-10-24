@@ -1,5 +1,6 @@
 import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:fleme/models/recognizer.dart';
+import 'package:fleme/models/recognizer_block.dart';
 import 'package:fleme/theme/box_shadow.dart';
 import 'package:fleme/views/filter_view.dart';
 import 'package:flutter/material.dart';
@@ -24,26 +25,39 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
   bool isTaped = false;
   bool isExpanded = false;
   bool isBeingAccepted = false;
-
+  bool isSelfDragging = false;
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
     return Center(
-      child: Draggable<Recognizer>(
+      child: Draggable<Recognizerblock>(
+        onDragStarted: () {
+          isSelfDragging = true;
+        },
+        onDragCompleted: () {
+          isSelfDragging = false;
+        },
+        onDragEnd: (details) {
+          isSelfDragging = false;
+        },
+        onDraggableCanceled: (velocity, offset) {
+          isSelfDragging = false;
+        },
         affinity: Axis.horizontal,
         dragAnchorStrategy: (draggable, context, position) {
           return Offset((context.size?.width ?? 200) / 2,
               ((context.size?.height ?? 200) + 20) / 2);
         },
-        data: recognizer,
+        data: recognizer?.getBlockRecognizedById(widget.textBlockId),
         feedback: Center(
           child: SizedBox(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height * 0.2,
+            width: width,
+            height: height * 0.2,
             child: Center(
               child: Container(
-                width: MediaQuery.of(context).size.width * 0.8,
+                width: width * 0.8,
                 decoration: BoxDecoration(
                   color: theme.backgroundColor.withOpacity(0.8),
                   borderRadius: BorderRadius.circular(5),
@@ -75,7 +89,7 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
             duration: const Duration(milliseconds: 100),
             padding: const EdgeInsets.all(10.0),
             margin: const EdgeInsets.all(5.0),
-            width: MediaQuery.of(context).size.width,
+            width: width,
             decoration: BoxDecoration(
               color: !isTaped
                   ? theme.backgroundColor
@@ -88,7 +102,7 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
               ),
             ),
             child: Column(children: [
-              DragTarget<Recognizer>(
+              DragTarget<Recognizerblock>(
                 onWillAccept: (data) {
                   setState(() {
                     isBeingAccepted = true;
@@ -102,20 +116,35 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
                 },
                 onAccept: (data) {
                   setState(() {
+                    if (!isSelfDragging) {
+                      data.unsave();
+                      Recognizerblock? localRecognizerBlock = recognizer!
+                          .getBlockRecognizedById(widget.textBlockId);
+                      if (localRecognizerBlock != null) {
+                        data.unsave();
+                        localRecognizerBlock.setTextEdited(
+                            "${data.getTextEdited()} \n ${localRecognizerBlock.getTextEdited()}");
+                        localRecognizerBlock.save();
+                        Provider.of<Recognizers>(context, listen: false)
+                            .refreshRecognizers();
+                      }
+                    }
                     isBeingAccepted = false;
                   });
                 },
                 builder: (context, candidateData, rejectedData) {
                   return AnimatedContainer(
                     duration: const Duration(milliseconds: 100),
-                    height: isBeingAccepted ? 40 : 20,
+                    height: isBeingAccepted && !isSelfDragging ? 35 : 5,
                     child: Center(
-                      child: Divider(
-                        indent: isBeingAccepted ? 20 : 40,
-                        endIndent: isBeingAccepted ? 20 : 40,
-                        color: theme.primaryColor,
-                        thickness: isBeingAccepted ? 2 : 1,
-                      ),
+                      child: isBeingAccepted && !isSelfDragging
+                          ? Divider(
+                              indent: isBeingAccepted ? 20 : 40,
+                              endIndent: isBeingAccepted ? 20 : 40,
+                              color: theme.primaryColor,
+                              thickness: isBeingAccepted ? 2 : 1,
+                            )
+                          : Container(),
                     ),
                   );
                 },
