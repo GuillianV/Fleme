@@ -33,8 +33,11 @@ class _ScanPageState extends State<ScanPage> {
   double zoom = 1.0;
   double maxZoomLevel = 1.0;
   double minZoomLevel = 1.0;
+  bool permissionsReady = false;
   PermissionStatus permissionStatus = PermissionStatus.denied;
-  Widget cameraPreview = Container();
+  Widget permissionPreview = const Center(
+    child: CircularProgressIndicator(),
+  );
 
   @override
   void initState() {
@@ -44,9 +47,6 @@ class _ScanPageState extends State<ScanPage> {
 
   loadCamera() async {
     await grantPermissions();
-    if (!permissionStatus.isGranted) {
-      return;
-    }
   }
 
   @override
@@ -55,7 +55,7 @@ class _ScanPageState extends State<ScanPage> {
     super.dispose();
   }
 
-  Future<void> grantPermissions() async {
+  Future<bool> grantPermissions() async {
     permissionStatus = await Permission.camera.status;
     if (!permissionStatus.isGranted) {
       permissionStatus = await Permission.camera.request();
@@ -68,6 +68,10 @@ class _ScanPageState extends State<ScanPage> {
     if (permissionStatus.isGranted) {
       await prepareCamera();
     }
+    setState(() {
+      permissionsReady = true;
+    });
+    return true;
   }
 
   @override
@@ -79,6 +83,38 @@ class _ScanPageState extends State<ScanPage> {
         Orientation.landscape; // check if the orientation is landscape
 
     ThemeData theme = Theme.of(context);
+
+    if (permissionsReady) {
+      permissionPreview = Center(
+          child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Center(
+              child: Text(
+                getPermissionText(),
+                style: theme.textTheme.bodyText2,
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: MorphismButton(
+              icon: Icon(Icons.perm_device_info_rounded,
+                  color: theme.colorScheme.secondary),
+              onTaped: () async {
+                await grantPermissions();
+                setState(() {});
+              },
+              textValue: '',
+            ),
+          )
+        ],
+      ));
+    }
 
     return permissionStatus.isGranted
         ? FutureBuilder<bool>(
@@ -218,24 +254,7 @@ class _ScanPageState extends State<ScanPage> {
               }
             },
           )
-        : Center(
-            child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: MorphismButton(
-                  // icon: Icon(Icons.camera_alt, color: theme.colorScheme.secondary),
-                  onTaped: () async {
-                    await grantPermissions();
-                    setState(() {});
-                  },
-                  textValue: 'Grant Camera Permission',
-                ),
-              )
-            ],
-          ));
+        : permissionPreview;
   }
 
   Future<void> _onTap(TapUpDetails details) async {
