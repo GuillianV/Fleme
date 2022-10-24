@@ -5,6 +5,7 @@ import 'package:fleme/models/providers/picture_provider.dart';
 import 'package:fleme/models/recognizer.dart';
 import 'package:fleme/widgets/morphism_button.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import '../models/providers/recognizer_provider.dart';
@@ -32,7 +33,8 @@ class _ScanPageState extends State<ScanPage> {
   double zoom = 1.0;
   double maxZoomLevel = 1.0;
   double minZoomLevel = 1.0;
-
+  PermissionStatus permissionStatus = PermissionStatus.denied;
+  Widget cameraPreview = Container();
 
   @override
   void initState() {
@@ -41,41 +43,31 @@ class _ScanPageState extends State<ScanPage> {
   }
 
   loadCamera() async {
-    await availableCameras().catchError((onError) {
-      exit(1);
-    }).then((cameras) {
-      controller = CameraController(
-        cameras[0],
-        ResolutionPreset.max,
-        imageFormatGroup: ImageFormatGroup.jpeg,
-        enableAudio: false,
-      );
-
-      controller.initialize().then((_) {
-        if (!mounted) {
-          return;
-        }
-        setState(() {
-          controllerRatio = controller.value.previewSize!.height /
-              controller.value.previewSize!.width;
-
-          cameraInitialized = Future.value(true);
-        });
-
-        controller.getMaxZoomLevel().then((value) => setState(() {
-              maxZoomLevel = value;
-            }));
-        controller.getMinZoomLevel().then((value) => setState(() {
-              minZoomLevel = value;
-            }));
-      });
-    });
+    await grantPermissions();
+    if (!permissionStatus.isGranted) {
+      return;
+    }
   }
 
   @override
   void dispose() {
     controller.dispose();
     super.dispose();
+  }
+
+  Future<void> grantPermissions() async {
+    permissionStatus = await Permission.camera.status;
+    if (!permissionStatus.isGranted) {
+      permissionStatus = await Permission.camera.request();
+
+      if (permissionStatus.isPermanentlyDenied) {
+        openAppSettings();
+      }
+    }
+
+    if (permissionStatus.isGranted) {
+      await prepareCamera();
+    }
   }
 
   @override
@@ -88,139 +80,162 @@ class _ScanPageState extends State<ScanPage> {
 
     ThemeData theme = Theme.of(context);
 
-    return FutureBuilder<bool>(
-      future: cameraInitialized,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          if (isLandscape) {
-            deviceRatio = width / height;
-            controllerRatio = (controller.value.previewSize?.width ?? 1) /
-                (controller.value.previewSize?.height ?? 1);
-          } else {
-            deviceRatio = height / width;
-            controllerRatio = (controller.value.previewSize?.height ?? 1) /
-                (controller.value.previewSize?.width ?? 1);
-          }
+    return permissionStatus.isGranted
+        ? FutureBuilder<bool>(
+            future: cameraInitialized,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                if (isLandscape) {
+                  deviceRatio = width / height;
+                  controllerRatio = (controller.value.previewSize?.width ?? 1) /
+                      (controller.value.previewSize?.height ?? 1);
+                } else {
+                  deviceRatio = height / width;
+                  controllerRatio =
+                      (controller.value.previewSize?.height ?? 1) /
+                          (controller.value.previewSize?.width ?? 1);
+                }
 
-          return Scaffold(
-            body: GestureDetector(
-              onTapUp: (details) {
-                _onTap(details);
-              },
-              child: Stack(children: [
-                Center(
-                  child: AspectRatio(
-                    aspectRatio: controllerRatio,
-                    child: GestureDetector(
-                      onVerticalDragUpdate: (details) {
-                        if (details.delta.dy < 0 && zoom < maxZoomLevel) {
-                          setState(() {
-                            zoom = zoom + 0.1;
-                            if (zoom > maxZoomLevel) zoom = maxZoomLevel;
-                            controller.setZoomLevel(zoom);
-                          });
-                        }
+                return Scaffold(
+                  body: GestureDetector(
+                    onTapUp: (details) {
+                      _onTap(details);
+                    },
+                    child: Stack(children: [
+                      Center(
+                        child: AspectRatio(
+                          aspectRatio: controllerRatio,
+                          child: GestureDetector(
+                            onVerticalDragUpdate: (details) {
+                              if (details.delta.dy < 0 && zoom < maxZoomLevel) {
+                                setState(() {
+                                  zoom = zoom + 0.1;
+                                  if (zoom > maxZoomLevel) zoom = maxZoomLevel;
+                                  controller.setZoomLevel(zoom);
+                                });
+                              }
 
-                        if (details.delta.dy > 0 && zoom > 1.0) {
-                          setState(() {
-                            zoom = zoom - 0.1;
-                            if (zoom < 1.0) zoom = 1;
-                            controller.setZoomLevel(zoom);
-                          });
-                        }
-                      },
-                      child: SizedBox(
-                          width: width,
-                          height: height,
-                          child: Container(
-                              clipBehavior: Clip.hardEdge,
-                              decoration: const BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15)),
-                              ),
-                              child: CameraPreview(controller))),
-                    ),
-                  ),
-                ),
-                if (showFocusCircle)
-                  Positioned(
-                      top: y - 20,
-                      left: x - 20,
-                      child: Container(
-                        height: 40,
-                        width: 40,
-                        decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                                color: theme.colorScheme.primary, width: 1.5)),
-                      )),
-                if (isPicked)
-                  Container(
-                      color: Colors.black54,
-                      child: const Center(child: CircularProgressIndicator())),
-              ]),
-            ),
-            floatingActionButtonLocation:
-                FloatingActionButtonLocation.centerFloat,
-            floatingActionButton: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: MorphismButton(
-                      icon: Icon(
-                        Icons.camera_alt,
-                        color: theme.colorScheme.secondary,
-                        size: 30.0,
-                        textDirection: TextDirection.ltr,
-                        semanticLabel:
-                            'Icon', // Announced in accessibility modes (e.g TalkBack/VoiceOver). This label does not show in the UI.
+                              if (details.delta.dy > 0 && zoom > 1.0) {
+                                setState(() {
+                                  zoom = zoom - 0.1;
+                                  if (zoom < 1.0) zoom = 1;
+                                  controller.setZoomLevel(zoom);
+                                });
+                              }
+                            },
+                            child: SizedBox(
+                                width: width,
+                                height: height,
+                                child: Container(
+                                    clipBehavior: Clip.hardEdge,
+                                    decoration: const BoxDecoration(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(15)),
+                                    ),
+                                    child: CameraPreview(controller))),
+                          ),
+                        ),
                       ),
-                      textValue: "Scan !",
-                      onTaped: () async {
-                        setState(() {
-                          isPicked = true;
-                        });
-                        pictureFile = await controller.takePicture();
-                        if (pictureFile != null) {
-                          var picture = context.read<Picture>();
-                          picture.saveFilePath(pictureFile?.path ?? "");
+                      if (showFocusCircle)
+                        Positioned(
+                            top: y - 20,
+                            left: x - 20,
+                            child: Container(
+                              height: 40,
+                              width: 40,
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                      color: theme.colorScheme.primary,
+                                      width: 1.5)),
+                            )),
+                      if (isPicked)
+                        Container(
+                            color: Colors.black54,
+                            child: const Center(
+                                child: CircularProgressIndicator())),
+                    ]),
+                  ),
+                  floatingActionButtonLocation:
+                      FloatingActionButtonLocation.centerFloat,
+                  floatingActionButton: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: MorphismButton(
+                            icon: Icon(
+                              Icons.camera_alt,
+                              color: theme.colorScheme.secondary,
+                              size: 30.0,
+                              textDirection: TextDirection.ltr,
+                              semanticLabel:
+                                  'Icon', // Announced in accessibility modes (e.g TalkBack/VoiceOver). This label does not show in the UI.
+                            ),
+                            textValue: "Scan !",
+                            onTaped: () async {
+                              setState(() {
+                                isPicked = true;
+                              });
+                              pictureFile = await controller.takePicture();
+                              if (pictureFile != null) {
+                                var picture = context.read<Picture>();
+                                picture.saveFilePath(pictureFile?.path ?? "");
 
-                          Recognizer recognizer =
-                              Recognizer.create(picture.getFilePath());
-                          await recognizer.setTextBlock();
-                          var recognizers = context.read<Recognizers>();
-                          recognizers.addRecognizer(recognizer);
+                                Recognizer recognizer =
+                                    Recognizer.create(picture.getFilePath());
+                                await recognizer.setTextBlock();
+                                var recognizers = context.read<Recognizers>();
+                                recognizers.addRecognizer(recognizer);
 
-                          int recognizerIndex =
-                              recognizers.getRecognizers().indexOf(recognizer);
+                                int recognizerIndex = recognizers
+                                    .getRecognizers()
+                                    .indexOf(recognizer);
 
-                          setState(() {
-                            isPicked = false;
-                          });
-                          Navigator.pushNamed(context, '/image_filter',
-                              arguments: recognizerIndex);
-                        } else {
-                          setState(() {
-                            isPicked = false;
-                          });
-                          Navigator.pushNamed(context, '/');
-                        }
+                                setState(() {
+                                  isPicked = false;
+                                });
+                                Navigator.pushNamed(context, '/image_filter',
+                                    arguments: recognizerIndex);
+                              } else {
+                                setState(() {
+                                  isPicked = false;
+                                });
+                                Navigator.pushNamed(context, '/');
+                              }
 
-                        // ignore: use_build_context_synchronously
-                      }),
+                              // ignore: use_build_context_synchronously
+                            }),
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                return Center(
+                  child: Container(child: const CircularProgressIndicator()),
+                );
+              }
+            },
+          )
+        : Center(
+            child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: MorphismButton(
+                  // icon: Icon(Icons.camera_alt, color: theme.colorScheme.secondary),
+                  onTaped: () async {
+                    await grantPermissions();
+                    setState(() {});
+                  },
+                  textValue: 'Grant Camera Permission',
                 ),
-              ],
-            ),
-          );
-        } else {
-          return Center(
-            child: Container(child: const CircularProgressIndicator()),
-          );
-        }
-      },
-    );
+              )
+            ],
+          ));
   }
 
   Future<void> _onTap(TapUpDetails details) async {
@@ -252,5 +267,52 @@ class _ScanPageState extends State<ScanPage> {
         });
       });
     }
+  }
+
+  String getPermissionText() {
+    switch (permissionStatus) {
+      case PermissionStatus.denied:
+        return "Permission denied, please grant permission to use camera";
+      case PermissionStatus.granted:
+        return "Permission granted";
+      case PermissionStatus.limited:
+        return "Permission limited, please grant permission to use camera";
+      case PermissionStatus.permanentlyDenied:
+        return "Permission permanently denied , please grant permission in settings to use camera";
+      case PermissionStatus.restricted:
+        return "Permission restricted";
+    }
+  }
+
+  Future<void> prepareCamera() async {
+    await availableCameras().catchError((onError) {
+      exit(1);
+    }).then((cameras) {
+      controller = CameraController(
+        cameras[0],
+        ResolutionPreset.max,
+        imageFormatGroup: ImageFormatGroup.jpeg,
+        enableAudio: false,
+      );
+
+      controller.initialize().then((_) {
+        if (!mounted) {
+          return;
+        }
+        setState(() {
+          controllerRatio = controller.value.previewSize!.height /
+              controller.value.previewSize!.width;
+
+          cameraInitialized = Future.value(true);
+        });
+
+        controller.getMaxZoomLevel().then((value) => setState(() {
+              maxZoomLevel = value;
+            }));
+        controller.getMinZoomLevel().then((value) => setState(() {
+              minZoomLevel = value;
+            }));
+      });
+    });
   }
 }
