@@ -5,6 +5,7 @@ import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:fleme/models/recognizer.dart';
 import 'package:fleme/models/recognizerNetwork.dart';
 import 'package:fleme/models/recognizer_block.dart';
+import 'package:fleme/widgets/drag_scroll_view.dart';
 import 'package:fleme/widgets/resume_widget.dart';
 import 'package:fleme/widgets/saved_block.dart';
 import 'package:flutter/material.dart';
@@ -27,14 +28,11 @@ class ImageRecognized extends StatefulWidget {
 
 class _ImageRecognizedState extends State<ImageRecognized> {
   bool isTextBlocks = true;
-  bool isDragging = false;
-  ScrollController scrollController = ScrollController();
-  ScrollPhysics physics = const AlwaysScrollableScrollPhysics();
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    final listViewKey = GlobalKey();
+    final GlobalKey listViewKey = GlobalKey();
     String description = '';
     TextEditingController controller = TextEditingController();
     double width = MediaQuery.of(context).size.width;
@@ -48,80 +46,44 @@ class _ImageRecognizedState extends State<ImageRecognized> {
       key: listViewKey,
       body: Consumer<DragProvider>(
         builder: (context, value, child) {
-          if (value.getDrag()) {
-            physics = const NeverScrollableScrollPhysics();
-          } else {
-            physics = const AlwaysScrollableScrollPhysics();
-          }
+          return DragScrollView(
+            widgetViewportKey: listViewKey,
+            enableDrag: value.getDrag(),
+            child: Column(
+              children: [
+                ImageResume(
+                    width: width,
+                    height: height,
+                    recognizedId: widget.recognizedId),
+                if (isTextBlocks)
+                  Consumer<Recognizers>(builder: (context, recognizers, child) {
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      padding: EdgeInsets.zero,
+                      scrollDirection: Axis.vertical,
+                      physics: const ScrollPhysics(),
+                      itemCount: recognizers
+                              .getRecognizer(widget.recognizedId)
+                              ?.getSavedTextBlock()
+                              .length ??
+                          0,
+                      itemBuilder: (context, index) {
+                        Recognizerblock textBlock = recognizers
+                            .getRecognizer(widget.recognizedId)!
+                            .getSavedTextBlock()[index];
 
-          return Listener(
-            onPointerMove: (PointerMoveEvent event) {
-              if (!value.getDrag()) return;
-
-              RenderBox render =
-                  listViewKey.currentContext?.findRenderObject() as RenderBox;
-              Offset position = render.localToGlobal(Offset.zero);
-              double topY = position.dy; // top position of the widget
-              double bottomY =
-                  topY + render.size.height; // bottom position of the widget
-              const moveDistance = 4;
-
-              const detectedRange = 150;
-              if (event.position.dy < topY + detectedRange &&
-                  scrollController.position.pixels >=
-                      scrollController.position.minScrollExtent) {
-                print(topY + detectedRange);
-                var to = scrollController.offset - moveDistance;
-                to = (to < 0) ? 0 : to;
-                scrollController.jumpTo(to);
-              }
-              if (event.position.dy > bottomY - detectedRange &&
-                  scrollController.position.pixels <=
-                      scrollController.position.maxScrollExtent) {
-                print(bottomY - detectedRange);
-                scrollController.jumpTo(scrollController.offset + moveDistance);
-              }
-            },
-            child: SingleChildScrollView(
-              controller: scrollController,
-              physics: physics,
-              child: Column(
-                children: [
-                  ImageResume(
-                      width: width,
-                      height: height,
-                      recognizedId: widget.recognizedId),
-                  if (isTextBlocks)
-                    Consumer<Recognizers>(
-                        builder: (context, recognizers, child) {
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        padding: EdgeInsets.zero,
-                        scrollDirection: Axis.vertical,
-                        physics: const ScrollPhysics(),
-                        itemCount: recognizers
-                                .getRecognizer(widget.recognizedId)
-                                ?.getSavedTextBlock()
-                                .length ??
-                            0,
-                        itemBuilder: (context, index) {
-                          Recognizerblock textBlock = recognizers
-                              .getRecognizer(widget.recognizedId)!
-                              .getSavedTextBlock()[index];
-
-                          return SavedBlockItem(
-                            recognizedId: widget.recognizedId,
-                            textBlockId: textBlock.id,
-                            text: textBlock.getTextEdited() ?? "",
-                          );
-                        },
-                      );
-                    }),
-                  Container(
-                    height: 100,
-                  )
-                ],
-              ),
+                        return SavedBlockItem(
+                          recognizedId: widget.recognizedId,
+                          textBlockId: textBlock.id,
+                          text: textBlock.getTextEdited() ?? "",
+                        );
+                      },
+                    );
+                  }),
+                Container(
+                  height: 100,
+                )
+              ],
             ),
           );
         },
