@@ -21,16 +21,9 @@ class DragScrollView extends StatefulWidget {
 
 class _DragScrollViewState extends State<DragScrollView> {
   ScrollController scrollController = ScrollController();
-  ScrollPhysics physicsController = const AlwaysScrollableScrollPhysics();
 
   @override
   Widget build(BuildContext context) {
-    if (widget.enableDrag) {
-      physicsController = const NeverScrollableScrollPhysics();
-    } else {
-      physicsController = const AlwaysScrollableScrollPhysics();
-    }
-
     return Listener(
         onPointerMove: (PointerMoveEvent event) {
           if (!widget.enableDrag) return;
@@ -38,7 +31,7 @@ class _DragScrollViewState extends State<DragScrollView> {
           RenderBox render = widget.widgetViewportKey.currentContext
               ?.findRenderObject() as RenderBox;
           Offset position = render.localToGlobal(Offset.zero);
-          double topY = position.dy; // top position of the widget
+          double topY = position.dy; // top positio n of the widget
           double bottomY =
               topY + render.size.height; // bottom position of the widget
           double moveDistance = widget.dragSpeed ?? 4;
@@ -59,7 +52,9 @@ class _DragScrollViewState extends State<DragScrollView> {
         },
         child: SingleChildScrollView(
             controller: scrollController,
-            physics: physicsController,
+            physics: widget.enableDrag
+                ? const NeverScrollableScrollPhysics()
+                : const AlwaysScrollableScrollPhysics(),
             child: widget.child));
   }
 }
