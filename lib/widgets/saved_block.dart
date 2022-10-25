@@ -46,11 +46,16 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 100),
           margin: const EdgeInsets.all(5.0),
+          padding: const EdgeInsets.all(5),
           width: width,
           decoration: BoxDecoration(
             color: !isTaped
-                ? theme.backgroundColor
-                : theme.backgroundColor.withOpacity(0.8),
+                ? (isSelfDragging
+                    ? theme.colorScheme.primary
+                    : theme.backgroundColor)
+                : (isSelfDragging
+                    ? theme.colorScheme.primary
+                    : theme.backgroundColor),
             borderRadius: BorderRadius.circular(5),
             boxShadow: box_shadow(context),
             border: Border.all(
@@ -59,50 +64,58 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
             ),
           ),
           child: Column(children: [
-            DragTarget<Recognizerblock>(
-              onWillAccept: (data) {
-                setState(() {
-                  isBeingAccepted = true;
-                });
-                return true;
-              },
-              onLeave: (data) {
-                setState(() {
-                  isBeingAccepted = false;
-                });
-              },
-              onAccept: (data) {
-                setState(() {
-                  if (!isSelfDragging) {
-                    data.unsave();
-                    Recognizerblock? localRecognizerBlock =
-                        recognizer!.getBlockRecognizedById(widget.textBlockId);
-                    if (localRecognizerBlock != null) {
-                      data.unsave();
-                      localRecognizerBlock.setTextEdited(
-                          "${data.getTextEdited()} \n ${localRecognizerBlock.getTextEdited()}");
-                      localRecognizerBlock.save();
-                      Provider.of<Recognizers>(context, listen: false)
-                          .refreshRecognizers();
-                    }
-                  }
-                  isBeingAccepted = false;
-                });
-              },
-              builder: (context, candidateData, rejectedData) {
-                return AnimatedContainer(
-                  duration: const Duration(milliseconds: 50),
-                  height: isBeingAccepted && !isSelfDragging ? 35 : 8,
-                  child: Center(
-                    child: isBeingAccepted && !isSelfDragging
-                        ? Divider(
-                            indent: isBeingAccepted ? 20 : 40,
-                            endIndent: isBeingAccepted ? 20 : 40,
+            Consumer<DragProvider>(
+              builder: (context, value, child) {
+                return DragTarget<Recognizerblock>(
+                  onWillAccept: (data) {
+                    setState(() {
+                      isBeingAccepted = true;
+                    });
+                    return true;
+                  },
+                  onLeave: (data) {
+                    setState(() {
+                      isBeingAccepted = false;
+                    });
+                  },
+                  onAccept: (data) {
+                    setState(() {
+                      if (!isSelfDragging) {
+                        data.unsave();
+                        Recognizerblock? localRecognizerBlock = recognizer!
+                            .getBlockRecognizedById(widget.textBlockId);
+                        if (localRecognizerBlock != null) {
+                          data.unsave();
+                          localRecognizerBlock.setTextEdited(
+                              "${data.getTextEdited()} \n ${localRecognizerBlock.getTextEdited()}");
+                          localRecognizerBlock.save();
+                          Provider.of<Recognizers>(context, listen: false)
+                              .refreshRecognizers();
+                        }
+                      }
+                      isBeingAccepted = false;
+                    });
+                  },
+                  builder: (context, candidateData, rejectedData) {
+                    if (value.getDrag() && !isSelfDragging) {
+                      return AnimatedContainer(
+                        duration: const Duration(milliseconds: 100),
+                        height: 20,
+                        child: Center(
+                          child: Divider(
+                            indent: isBeingAccepted ? 20 : 70,
+                            endIndent: isBeingAccepted ? 20 : 70,
                             color: theme.primaryColor,
-                            thickness: isBeingAccepted ? 2 : 1,
-                          )
-                        : Container(),
-                  ),
+                            thickness: isBeingAccepted ? 3 : 1,
+                          ),
+                        ),
+                      );
+                    } else {
+                      return Container(
+                        height: 20,
+                      );
+                    }
+                  },
                 );
               },
             ),
@@ -174,17 +187,13 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
                                 color: theme.primaryColor)),
                       ),
                       onTapDown: (details) {
+                        isSelfDragging = true;
                         dragProvider.toggleDrag(true);
                       },
                       onLongPressDown: (details) {
+                        isSelfDragging = true;
                         dragProvider.toggleDrag(true);
                       },
-                      // onVerticalDragDown: (details) {
-                      //   dragProvider.toggleDrag(true);
-                      // },
-                      // onHorizontalDragDown: (details) {
-                      //   dragProvider.toggleDrag(true);
-                      // },
                     ),
                   )
                 ],
@@ -262,53 +271,59 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
                   ],
                 )
               ]),
-            DragTarget<Recognizerblock>(
-              onWillAccept: (data) {
-                setState(() {
-                  isBeingAcceptedBottom = true;
-                });
-                return true;
-              },
-              onLeave: (data) {
-                setState(() {
-                  isBeingAcceptedBottom = false;
-                });
-              },
-              onAccept: (data) {
-                setState(() {
-                  if (!isSelfDragging) {
-                    data.unsave();
-                    Recognizerblock? localRecognizerBlock =
-                        recognizer!.getBlockRecognizedById(widget.textBlockId);
-                    if (localRecognizerBlock != null) {
+            Consumer<DragProvider>(builder: (context, value, child) {
+              return DragTarget<Recognizerblock>(
+                onWillAccept: (data) {
+                  setState(() {
+                    isBeingAcceptedBottom = true;
+                  });
+                  return true;
+                },
+                onLeave: (data) {
+                  setState(() {
+                    isBeingAcceptedBottom = false;
+                  });
+                },
+                onAccept: (data) {
+                  setState(() {
+                    if (!isSelfDragging) {
                       data.unsave();
-                      localRecognizerBlock.setTextEdited(
-                          "${localRecognizerBlock.getTextEdited()} \n ${data.getTextEdited()}");
-                      localRecognizerBlock.save();
-                      Provider.of<Recognizers>(context, listen: false)
-                          .refreshRecognizers();
+                      Recognizerblock? localRecognizerBlock = recognizer!
+                          .getBlockRecognizedById(widget.textBlockId);
+                      if (localRecognizerBlock != null) {
+                        data.unsave();
+                        localRecognizerBlock.setTextEdited(
+                            "${localRecognizerBlock.getTextEdited()} \n ${data.getTextEdited()}");
+                        localRecognizerBlock.save();
+                        Provider.of<Recognizers>(context, listen: false)
+                            .refreshRecognizers();
+                      }
                     }
+                    isBeingAcceptedBottom = false;
+                  });
+                },
+                builder: (context, candidateData, rejectedData) {
+                  if (value.getDrag() && !isSelfDragging) {
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 100),
+                      height: 20,
+                      child: Center(
+                        child: Divider(
+                          indent: isBeingAcceptedBottom ? 20 : 70,
+                          endIndent: isBeingAcceptedBottom ? 20 : 70,
+                          color: theme.primaryColor,
+                          thickness: isBeingAcceptedBottom ? 3 : 1,
+                        ),
+                      ),
+                    );
+                  } else {
+                    return Container(
+                      height: 20,
+                    );
                   }
-                  isBeingAcceptedBottom = false;
-                });
-              },
-              builder: (context, candidateData, rejectedData) {
-                return AnimatedContainer(
-                  duration: const Duration(milliseconds: 100),
-                  height: isBeingAcceptedBottom && !isSelfDragging ? 35 : 5,
-                  child: Center(
-                    child: isBeingAcceptedBottom && !isSelfDragging
-                        ? Divider(
-                            indent: isBeingAcceptedBottom ? 20 : 40,
-                            endIndent: isBeingAcceptedBottom ? 20 : 40,
-                            color: theme.primaryColor,
-                            thickness: isBeingAcceptedBottom ? 2 : 1,
-                          )
-                        : Container(),
-                  ),
-                );
-              },
-            ),
+                },
+              );
+            }),
           ]),
         ),
       ),
