@@ -1,3 +1,4 @@
+import 'package:fleme/models/providers/drag_provider.dart';
 import 'package:fleme/models/providers/picture_provider.dart';
 import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:fleme/theme/theme.dart';
@@ -21,6 +22,9 @@ Future main() async {
         ),
         ChangeNotifierProvider<Recognizers>(
           create: (_) => Recognizers(),
+        ),
+        ChangeNotifierProvider<DragProvider>(
+          create: (_) => DragProvider(),
         ),
       ],
       child: const MyApp(),

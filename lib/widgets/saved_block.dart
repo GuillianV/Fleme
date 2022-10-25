@@ -1,3 +1,4 @@
+import 'package:fleme/models/providers/drag_provider.dart';
 import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:fleme/models/recognizer.dart';
 import 'package:fleme/models/recognizer_block.dart';
@@ -25,25 +26,32 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
   bool isTaped = false;
   bool isExpanded = false;
   bool isBeingAccepted = false;
+  bool isBeingAcceptedBottom = false;
   bool isSelfDragging = false;
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
+    DragProvider dragProvider =
+        Provider.of<DragProvider>(context, listen: false);
     return Center(
       child: Draggable<Recognizerblock>(
         onDragStarted: () {
           isSelfDragging = true;
+          dragProvider.toggleDrag(true);
         },
         onDragCompleted: () {
           isSelfDragging = false;
+          dragProvider.toggleDrag(false);
         },
         onDragEnd: (details) {
           isSelfDragging = false;
+          dragProvider.toggleDrag(false);
         },
         onDraggableCanceled: (velocity, offset) {
           isSelfDragging = false;
+          dragProvider.toggleDrag(false);
         },
         affinity: Axis.horizontal,
         dragAnchorStrategy: (draggable, context, position) {
@@ -59,7 +67,7 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
               child: Container(
                 width: width * 0.8,
                 decoration: BoxDecoration(
-                  color: theme.backgroundColor.withOpacity(0.8),
+                  color: theme.backgroundColor.withOpacity(0.4),
                   borderRadius: BorderRadius.circular(5),
                   boxShadow: box_shadow(context),
                   border: Border.all(
@@ -134,8 +142,8 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
                 },
                 builder: (context, candidateData, rejectedData) {
                   return AnimatedContainer(
-                    duration: const Duration(milliseconds: 100),
-                    height: isBeingAccepted && !isSelfDragging ? 35 : 5,
+                    duration: const Duration(milliseconds: 50),
+                    height: isBeingAccepted && !isSelfDragging ? 35 : 8,
                     child: Center(
                       child: isBeingAccepted && !isSelfDragging
                           ? Divider(
@@ -149,7 +157,19 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
                   );
                 },
               ),
-              Text(widget.text),
+              Row(
+                children: [
+                  SizedBox(
+                    width: width * 0.8,
+                    child: Text(
+                      widget.text,
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyText2,
+                    ),
+                  ),
+                  Icon(Icons.drag_indicator, color: theme.primaryColor),
+                ],
+              ),
               if (!isExpanded)
                 const Icon(
                   Icons.add,
@@ -221,7 +241,54 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
                       )
                     ],
                   )
-                ])
+                ]),
+              DragTarget<Recognizerblock>(
+                onWillAccept: (data) {
+                  setState(() {
+                    isBeingAcceptedBottom = true;
+                  });
+                  return true;
+                },
+                onLeave: (data) {
+                  setState(() {
+                    isBeingAcceptedBottom = false;
+                  });
+                },
+                onAccept: (data) {
+                  setState(() {
+                    if (!isSelfDragging) {
+                      data.unsave();
+                      Recognizerblock? localRecognizerBlock = recognizer!
+                          .getBlockRecognizedById(widget.textBlockId);
+                      if (localRecognizerBlock != null) {
+                        data.unsave();
+                        localRecognizerBlock.setTextEdited(
+                            "${localRecognizerBlock.getTextEdited()} \n ${data.getTextEdited()}");
+                        localRecognizerBlock.save();
+                        Provider.of<Recognizers>(context, listen: false)
+                            .refreshRecognizers();
+                      }
+                    }
+                    isBeingAcceptedBottom = false;
+                  });
+                },
+                builder: (context, candidateData, rejectedData) {
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 100),
+                    height: isBeingAcceptedBottom && !isSelfDragging ? 35 : 5,
+                    child: Center(
+                      child: isBeingAcceptedBottom && !isSelfDragging
+                          ? Divider(
+                              indent: isBeingAcceptedBottom ? 20 : 40,
+                              endIndent: isBeingAcceptedBottom ? 20 : 40,
+                              color: theme.primaryColor,
+                              thickness: isBeingAcceptedBottom ? 2 : 1,
+                            )
+                          : Container(),
+                    ),
+                  );
+                },
+              ),
             ]),
           ),
         ),

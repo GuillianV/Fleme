@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:fleme/models/providers/drag_provider.dart';
 import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:fleme/models/recognizer.dart';
 import 'package:fleme/models/recognizerNetwork.dart';
@@ -27,6 +28,7 @@ class ImageRecognized extends StatefulWidget {
 class _ImageRecognizedState extends State<ImageRecognized> {
   bool isTextBlocks = true;
   bool isDragging = false;
+  ScrollPhysics physics = const AlwaysScrollableScrollPhysics();
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
@@ -36,48 +38,62 @@ class _ImageRecognizedState extends State<ImageRecognized> {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
 
+    ScrollController scrollController = ScrollController();
+
     Recognizers recognizers = Provider.of<Recognizers>(context, listen: false);
     Recognizer? recognizer = recognizers.getRecognizer(widget.recognizedId);
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            ImageResume(
-                width: width,
-                height: height,
-                recognizedId: widget.recognizedId),
-            if (isTextBlocks)
-              Consumer<Recognizers>(builder: (context, recognizers, child) {
-                return ListView.builder(
-                  shrinkWrap: true,
-                  padding: EdgeInsets.zero,
-                  scrollDirection: Axis.vertical,
-                  physics: const ScrollPhysics(),
-                  itemCount: recognizers
-                          .getRecognizer(widget.recognizedId)
-                          ?.getSavedTextBlock()
-                          .length ??
-                      0,
-                  itemBuilder: (context, index) {
-                    Recognizerblock textBlock = recognizers
-                        .getRecognizer(widget.recognizedId)!
-                        .getSavedTextBlock()[index];
+      body: Consumer<DragProvider>(
+        builder: (context, value, child) {
+          if (value.getDrag()) {
+            physics = const NeverScrollableScrollPhysics();
+          } else {
+            physics = const AlwaysScrollableScrollPhysics();
+          }
 
-                    return SavedBlockItem(
-                      recognizedId: widget.recognizedId,
-                      textBlockId: textBlock.id,
-                      text: textBlock.getTextEdited() ?? "",
+          return SingleChildScrollView(
+            controller: scrollController,
+            physics: physics,
+            child: Column(
+              children: [
+                ImageResume(
+                    width: width,
+                    height: height,
+                    recognizedId: widget.recognizedId),
+                if (isTextBlocks)
+                  Consumer<Recognizers>(builder: (context, recognizers, child) {
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      padding: EdgeInsets.zero,
+                      scrollDirection: Axis.vertical,
+                      physics: const ScrollPhysics(),
+                      itemCount: recognizers
+                              .getRecognizer(widget.recognizedId)
+                              ?.getSavedTextBlock()
+                              .length ??
+                          0,
+                      itemBuilder: (context, index) {
+                        Recognizerblock textBlock = recognizers
+                            .getRecognizer(widget.recognizedId)!
+                            .getSavedTextBlock()[index];
+
+                        return SavedBlockItem(
+                          recognizedId: widget.recognizedId,
+                          textBlockId: textBlock.id,
+                          text: textBlock.getTextEdited() ?? "",
+                        );
+                      },
                     );
-                  },
-                );
-              }),
-            Container(
-              height: 100,
-            )
-          ],
-        ),
+                  }),
+                Container(
+                  height: 100,
+                )
+              ],
+            ),
+          );
+        },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Row(
