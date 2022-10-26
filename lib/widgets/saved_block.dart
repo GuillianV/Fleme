@@ -133,6 +133,7 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
                   Draggable<Recognizerblock>(
                     onDragStarted: () {
                       isSelfDragging = true;
+                      dragProvider.toggleDrag(true);
                     },
                     onDragCompleted: () {
                       isSelfDragging = false;
@@ -186,13 +187,17 @@ class _SavedBlockItemState extends State<SavedBlockItem> {
                             child: Icon(Icons.drag_indicator,
                                 color: theme.primaryColor)),
                       ),
-                      onTapDown: (details) {
-                        isSelfDragging = true;
-                        dragProvider.toggleDrag(true);
-                      },
                       onLongPressDown: (details) {
                         isSelfDragging = true;
                         dragProvider.toggleDrag(true);
+                      },
+                      onLongPressEnd: (details) {
+                        isSelfDragging = false;
+                        dragProvider.toggleDrag(false);
+                      },
+                      onLongPressCancel: () {
+                        isSelfDragging = false;
+                        dragProvider.toggleDrag(false);
                       },
                     ),
                   )

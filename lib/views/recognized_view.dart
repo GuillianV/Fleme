@@ -48,6 +48,7 @@ class _ImageRecognizedState extends State<ImageRecognized> {
         builder: (context, value, child) {
           return DragScrollView(
             widgetViewportKey: listViewKey,
+            dragDistance: 40,
             enableDrag: value.getDrag(),
             child: Column(
               children: [
