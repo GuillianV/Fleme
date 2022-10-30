@@ -150,12 +150,9 @@ class _ImageRecognizedState extends State<ImageRecognized> {
                       recognzers.getRecognizer(widget.recognizedId);
                   if (recognizer == null) Navigator.pushNamed(context, "/");
 
-                  String text = "";
-                  recognizer!.getSavedTextBlock().forEach((element) {
-                    text += "${element.getTextEdited()}\n";
-                  });
+                  
                   RecognizerNetwork recognizerNetwork =
-                      await RecognizerNetwork.post(text);
+                      await RecognizerNetwork.post(recognizer!);
 
                   showAnimatedDialog(
                     context: context,
