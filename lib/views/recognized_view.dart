@@ -150,9 +150,21 @@ class _ImageRecognizedState extends State<ImageRecognized> {
                       recognzers.getRecognizer(widget.recognizedId);
                   if (recognizer == null) Navigator.pushNamed(context, "/");
 
-                  
-                  RecognizerNetwork recognizerNetwork =
+                  RecognizerNetwork? recognizerNetwork =
                       await RecognizerNetwork.post(recognizer!);
+
+                  if (recognizerNetwork == null) {
+                    Fluttertoast.showToast(
+                        msg: "Error: Fleme website is Disconnected",
+                        toastLength: Toast.LENGTH_LONG,
+                        gravity: ToastGravity.CENTER,
+                        timeInSecForIosWeb: 1,
+                        backgroundColor:
+                            const Color.fromARGB(255, 101, 101, 101),
+                        textColor: Colors.white,
+                        fontSize: 16.0);
+                    return;
+                  }
 
                   showAnimatedDialog(
                     context: context,

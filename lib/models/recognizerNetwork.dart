@@ -1,12 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
+
 import 'package:fleme/models/recognizeData.dart';
 import 'package:fleme/models/recognizer.dart';
-import 'package:fleme/models/recognizer_block.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import "package:http/http.dart" as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import "package:http/http.dart" as http;
 
 class RecognizerNetwork {
   String? url;
@@ -29,28 +26,38 @@ class RecognizerNetwork {
     );
   }
 
-  static Future<RecognizerNetwork> get(_url) async {
-    String? url = dotenv.env['BACK_URL'] ?? "127.0.0.1";
-    String? port = dotenv.env['BACK_PORT'] ?? "3000";
-    var result = await http.get(Uri.parse("$url:$port/recognize/$_url"));
-    var decodeReesp = jsonDecode(result.body);
-    return RecognizerNetwork.fromJson(decodeReesp);
-  }
+  static Future<RecognizerNetwork?> post(Recognizer recognizer) async {
+    RecognizerNetwork? recognizerFetched;
 
-  static Future<RecognizerNetwork> post(Recognizer recognizer) async {
-    String? url = dotenv.env['BACK_URL'] ?? "127.0.0.1";
-    String? port = dotenv.env['BACK_PORT'] ?? "3000";
-    late Uri uri;
-    Map<String,dynamic> parsed = RecognizerData.create(recognizer).getParsed();
-    if (dotenv.env["BACK_SECURED"]! == 'false') {
-      
-      uri = Uri.http("$url:$port", "/recognize", {"data":jsonEncode(parsed) });
-    } else if (dotenv.env["BACK_SECURED"]! == 'true') {
-      uri = Uri.https("$url", "/recognize",   {"data":jsonEncode(parsed) });
+    String? url = dotenv.env['BACK_URL'];
+    if (url == null) {
+      throw Exception("Missing 'BACK_URL in .env");
     }
 
-    var result = await http.post(uri);
-    var decodeReesp = jsonDecode(result.body);
-    return RecognizerNetwork.fromJson(decodeReesp);
+    String? port = dotenv.env['BACK_PORT'];
+    if (url == null) {
+      throw Exception("Missing 'BACK_PORT' in .env");
+    }
+
+    bool isBackSecured = port == '443';
+    Uri uri;
+    Map<String, dynamic> parsed = RecognizerData.create(recognizer).getParsed();
+
+    if (isBackSecured) {
+      uri = Uri.https(url, "/recognize", {"data": jsonEncode(parsed)});
+    } else {
+      uri = Uri.http("$url:$port", "/recognize", {"data": jsonEncode(parsed)});
+    }
+
+    try {
+      recognizerFetched = await http.post(uri).then((result) {
+        var decodeReesp = jsonDecode(result.body);
+        return RecognizerNetwork.fromJson(decodeReesp);
+      }).timeout(const Duration(seconds: 5));
+    } catch (e) {
+      print(e);
+    } finally {
+      return recognizerFetched;
+    }
   }
 }
