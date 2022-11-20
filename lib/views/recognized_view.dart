@@ -1,18 +1,15 @@
-import 'dart:io';
-
 import 'package:fleme/models/providers/drag_provider.dart';
 import 'package:fleme/models/providers/recognizer_provider.dart';
 import 'package:fleme/models/recognizer.dart';
 import 'package:fleme/models/recognizerNetwork.dart';
 import 'package:fleme/models/recognizer_block.dart';
+import 'package:fleme/utils/toast.dart';
 import 'package:fleme/widgets/drag_scroll_view.dart';
 import 'package:fleme/widgets/resume_widget.dart';
 import 'package:fleme/widgets/saved_block.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -121,30 +118,6 @@ class _ImageRecognizedState extends State<ImageRecognized> {
                 heroTag: "link",
                 backgroundColor: theme.colorScheme.primary,
                 onPressed: () async {
-                  bool connected = false;
-                  final result = await InternetAddress.lookup("google.com");
-
-                  try {
-                    if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-                      connected = true;
-                    }
-                  } on SocketException catch (_) {
-                    print('not connected');
-                  }
-
-                  if (!connected) {
-                    Fluttertoast.showToast(
-                        msg: "Error: No internet connection",
-                        toastLength: Toast.LENGTH_LONG,
-                        gravity: ToastGravity.CENTER,
-                        timeInSecForIosWeb: 1,
-                        backgroundColor:
-                            const Color.fromARGB(255, 101, 101, 101),
-                        textColor: Colors.white,
-                        fontSize: 16.0);
-                    return;
-                  }
-
                   Recognizers recognzers = context.read<Recognizers>();
                   Recognizer? recognizer =
                       recognzers.getRecognizer(widget.recognizedId);
@@ -154,15 +127,7 @@ class _ImageRecognizedState extends State<ImageRecognized> {
                       await RecognizerNetwork.post(recognizer!);
 
                   if (recognizerNetwork == null) {
-                    Fluttertoast.showToast(
-                        msg: "Error: Fleme website is Disconnected",
-                        toastLength: Toast.LENGTH_LONG,
-                        gravity: ToastGravity.CENTER,
-                        timeInSecForIosWeb: 1,
-                        backgroundColor:
-                            const Color.fromARGB(255, 101, 101, 101),
-                        textColor: Colors.white,
-                        fontSize: 16.0);
+                    simpleToast("Erreur de connexion");
                     return;
                   }
 
@@ -170,27 +135,19 @@ class _ImageRecognizedState extends State<ImageRecognized> {
                     context: context,
                     barrierDismissible: true,
                     builder: (BuildContext context) {
-                      late String urlValue;
-                      late Uri uri;
-                      if (dotenv.env["BACK_SECURED"]! == 'false') {
-                        urlValue =
-                            "${dotenv.env['BACK_URL']!}:${dotenv.env['BACK_PORT']!}/${recognizerNetwork.url}";
-                      } else if (dotenv.env["BACK_SECURED"]! == 'true') {
-                        urlValue =
-                            "${dotenv.env['BACK_URL']!}/${recognizerNetwork.url}";
-                      }
-
-                      ClipboardData data = ClipboardData(text: urlValue);
+                      String recognizerWebsiteUrl =
+                          recognizerNetwork.getWebsiteUrl(true);
+                      ClipboardData data =
+                          ClipboardData(text: recognizerWebsiteUrl);
                       Clipboard.setData(data);
 
                       return ClassicGeneralDialogWidget(
                         titleText: "Link Copied",
                         negativeText: 'Close',
                         positiveText: 'Check',
-                        contentText: urlValue,
+                        contentText: recognizerNetwork.getWebsiteUrl(false),
                         onPositiveClick: () async {
-                          Uri uri = Uri.parse(
-                              "${dotenv.env["BACK_SECURED"]! == 'false' ? 'http://' : 'https://'}$urlValue");
+                          Uri uri = Uri.parse(recognizerWebsiteUrl);
                           await launchUrl(uri,
                               mode: LaunchMode.externalApplication);
 

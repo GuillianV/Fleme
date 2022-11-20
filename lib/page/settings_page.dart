@@ -26,9 +26,12 @@ class _SettingsPageState extends State<SettingsPage> {
           Container(
             margin: EdgeInsetsGeometry.lerp(
                 const EdgeInsets.all(10), const EdgeInsets.all(10), 10),
-            child: Text(
-              'Settings',
-              style: theme.textTheme.headline2,
+            child: FittedBox(
+              fit: BoxFit.fitWidth,
+              child: Text(
+                'Parametres',
+                style: theme.textTheme.headline2,
+              ),
             ),
           ),
           Container(

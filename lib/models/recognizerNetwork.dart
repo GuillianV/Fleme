@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:fleme/models/recognizeData.dart';
 import 'package:fleme/models/recognizer.dart';
+import 'package:fleme/utils/env.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import "package:http/http.dart" as http;
 
@@ -24,6 +25,19 @@ class RecognizerNetwork {
       json["creation"],
       json["url"],
     );
+  }
+
+  String getWebsiteUrl(bool getProtocol) {
+    String backUrl = getEnvValue('BACK_URL');
+    String port = getEnvValue('BACK_PORT');
+    String urlValue;
+    bool isBackSecured = port == '443';
+    if (isBackSecured) {
+      urlValue = "${(getProtocol ? "https://" : "")}$backUrl/$url";
+    } else {
+      urlValue = "${(getProtocol ? "http://" : "")}$backUrl:$port/$url";
+    }
+    return urlValue;
   }
 
   static Future<RecognizerNetwork?> post(Recognizer recognizer) async {
